@@ -1,0 +1,4 @@
+node_modules/
+agent-keys.json
+.env
+.shipguard/

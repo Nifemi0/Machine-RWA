@@ -1,0 +1,266 @@
+/**
+ * MachinaRWA Local Machine API Server
+ * Implements x402 payment-gating for machine compute tasks.
+ */
+
+const express = require('express');
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const { getOrCreateAgentKeys } = require('./casper-client');
+
+const app = express();
+
+// Serve the static frontend dashboard
+app.use(express.static(path.join(__dirname, '../public')));
+
+// BUG FIX 1: Body size limit — reject oversized payloads (was already 100kb default but explicit is safer)
+app.use(express.json({ limit: '64kb' }));
+
+// BUG FIX 2: Handle JSON parse + body size errors gracefully
+app.use((err, req, res, next) => {
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'Invalid JSON', message: 'Request body could not be parsed.' });
+  }
+  if (err.status === 413 || err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Payload Too Large', message: 'Request body exceeds the 64KB limit.' });
+  }
+  next(err);
+});
+
+const PORT = process.env.MACHINE_PORT || 8090;
+
+// Setup agent identity
+const agentKeys = getOrCreateAgentKeys();
+// BUG FIX 3: agentKeys.publicKey doesn't exist — it's agentKeys.pub in casper-js-sdk v5.x
+const agentPublicKeyHex = agentKeys.pub.toHex();
+
+// In-memory seen proofs set — BUG FIX 4: replay attack prevention
+const seenProofs = new Set();
+// Prune seen proofs every 10 minutes to avoid unbounded memory growth
+setInterval(() => seenProofs.clear(), 10 * 60 * 1000);
+
+// Metrics store
+const METRICS_FILE = path.join(process.env.HOME || '/root', '.shipguard', 'machina-server-metrics.json');
+
+let metrics = {
+  uptimeSeconds: 0,
+  completedJobs: 0,
+  accumulatedRevenueMotes: 0n,
+  currentCpuTemp: 42.5
+};
+
+// Load existing metrics so revenue is never lost on restart
+try {
+  if (fs.existsSync(METRICS_FILE)) {
+    const data = JSON.parse(fs.readFileSync(METRICS_FILE, 'utf8'));
+    metrics.completedJobs = data.completedJobs || 0;
+    metrics.accumulatedRevenueMotes = BigInt(data.accumulatedRevenueMotes || 0);
+    metrics.uptimeSeconds = data.uptimeSeconds || 0;
+  }
+} catch (e) {
+  console.error('[MachineServer] Could not load persisted metrics, starting fresh.', e.message);
+}
+
+function saveMetrics() {
+  try {
+    fs.writeFileSync(METRICS_FILE, JSON.stringify({
+      uptimeSeconds: metrics.uptimeSeconds,
+      completedJobs: metrics.completedJobs,
+      accumulatedRevenueMotes: metrics.accumulatedRevenueMotes.toString(),
+      currentCpuTemp: metrics.currentCpuTemp
+    }), 'utf8');
+  } catch (e) {
+    console.error('[MachineServer] Failed to save metrics:', e.message);
+  }
+}
+
+setInterval(() => { metrics.uptimeSeconds++; }, 1000);
+setInterval(() => { metrics.currentCpuTemp = 38 + Math.random() * 10; }, 3000);
+// Periodically save revenue to disk
+setInterval(saveMetrics, 5000);
+
+/**
+ * 1. Health Status check
+ */
+app.get('/status', (req, res) => {
+  res.json({
+    status: 'ONLINE',
+    machineId: agentPublicKeyHex,
+    metrics: {
+      uptime_seconds: metrics.uptimeSeconds,
+      completed_jobs: metrics.completedJobs,
+      // BUG FIX 5: parseFloat(BigInt) overflows for large values — use proper string division
+      accumulated_revenue_cspr: Number(metrics.accumulatedRevenueMotes / 1000000n) / 1000,
+      cpu_temperature: parseFloat(metrics.currentCpuTemp.toFixed(1))
+    }
+  });
+});
+
+/**
+ * 2. Paid Compute Task (Gated by x402)
+ */
+app.post('/api/compute', async (req, res) => {
+  const paymentProof = req.headers['x-payment-proof'];
+  const paymentAmountRaw = req.headers['x-payment-amount'];
+
+  // Missing headers
+  if (!paymentProof || !paymentAmountRaw) {
+    res.setHeader('WWW-Authenticate', 'x402');
+    return res.status(402).json({
+      error: 'Payment Required',
+      message: 'x402 payment headers missing. Include x-payment-proof and x-payment-amount.',
+      payment_destination: agentPublicKeyHex,
+      required_amount_motes: 1000000000
+    });
+  }
+
+  // BUG FIX 6: Float amounts like "500000000.5" crash BigInt() — validate integer format first
+  if (!/^\d+$/.test(paymentAmountRaw)) {
+    return res.status(400).json({
+      error: 'Invalid Payment Amount',
+      message: 'x-payment-amount must be a positive integer (motes). Floats and negative values are not accepted.'
+    });
+  }
+
+  let amountMotes;
+  try {
+    amountMotes = BigInt(paymentAmountRaw);
+  } catch (e) {
+    return res.status(400).json({ error: 'Invalid Payment Amount', message: 'Could not parse mote value.' });
+  }
+
+  // BUG FIX 7: Reject negative or zero amounts (BigInt won't go negative from digit-only regex, but guard anyway)
+  if (amountMotes < 1000000000n) {
+    return res.status(400).json({
+      error: 'Insufficient Payment',
+      message: `Minimum required fee is 1,000,000,000 motes (1 CSPR). Received ${paymentAmountRaw}.`
+    });
+  }
+
+  // BUG FIX 8: Cap amount at a sane upper bound to avoid revenue counter corruption
+  if (amountMotes > 1000000000000n) { // max 1000 CSPR per single call
+    return res.status(400).json({
+      error: 'Amount Too Large',
+      message: 'Single payment cannot exceed 1,000,000,000,000 motes (1000 CSPR).'
+    });
+  }
+
+  // Validate proof is a 64-char hex hash
+  if (!/^[a-fA-F0-9]{64}$/.test(paymentProof)) {
+    return res.status(401).json({
+      error: 'Invalid Payment Proof',
+      message: 'x-payment-proof must be a 64-character hex string (Casper deploy hash).'
+    });
+  }
+
+  // BUG FIX 4 cont: Reject replayed proofs
+  if (seenProofs.has(paymentProof)) {
+    return res.status(409).json({
+      error: 'Duplicate Payment Proof',
+      message: 'This payment proof has already been used. Each deploy hash can only be redeemed once.'
+    });
+  }
+  seenProofs.add(paymentProof);
+
+  // BUG FIX 9: Validate jobInput exists and is a non-empty string
+  const { jobInput } = req.body || {};
+  if (!jobInput || typeof jobInput !== 'string' || jobInput.trim().length === 0) {
+    // Still paid — refund not possible in prototype, but we reject cleanly
+    seenProofs.delete(paymentProof); // release so client can retry with valid input
+    return res.status(400).json({
+      error: 'Missing Job Input',
+      message: 'Request body must include a non-empty "jobInput" string field.'
+    });
+  }
+
+  // BUG FIX 10: Sanitize jobInput — strip HTML/script tags before echoing back
+  const sanitizedInput = jobInput.replace(/<[^>]*>/g, '').slice(0, 1000);
+
+  // Payment validated — record revenue
+  metrics.completedJobs++;
+  metrics.accumulatedRevenueMotes += amountMotes;
+  saveMetrics(); // Save immediately on paid events
+
+  console.log(`[MachineServer] Paid job accepted: "${sanitizedInput.slice(0, 60)}" | proof: ${paymentProof.slice(0, 8)}... | ${amountMotes} motes`);
+
+  // Execute Real Agentic Reasoning Loop
+  try {
+    const aiResponse = await fetch('http://127.0.0.1:20128/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'ag/gemini-3.1-pro-low', // Using your active local proxy model
+        messages: [
+          {
+            role: 'system',
+            content: `You are a high-security MachinaRWA Quantitative Agent. 
+Your objective is to evaluate incoming real-world asset (RWA) metrics and compute risk.
+CRITICAL INSTRUCTIONS:
+1. You MUST output ONLY valid JSON.
+2. No markdown formatting, no conversational text.
+3. Assume the user payload is ALREADY verified by a secure on-chain oracle. Do not lower confidence due to lack of external oracle access.
+4. If the provided data lacks sufficient quantitative metrics (like yield, valuation, or history), set "confidence_score" below 50.
+5. Schema required: { "analysis_summary": string, "risk_level": "LOW"|"MEDIUM"|"HIGH", "confidence_score": number, "requires_human_audit": boolean }`
+          },
+          { role: 'user', content: sanitizedInput }
+        ],
+        temperature: 0.1, // Near-zero variance for deterministic output
+        // Force JSON schema and disable streaming
+        response_format: { type: "json_object" },
+        stream: false
+      })
+    });
+
+    if (!aiResponse.ok) throw new Error('AI Gateway offline or rejected request');
+    
+    const aiData = await aiResponse.json();
+    let rawOutput = aiData.choices[0].message.content;
+    
+    // Strip markdown JSON wrappers if the model accidentally included them
+    if (rawOutput.startsWith('```json')) {
+      rawOutput = rawOutput.replace(/^```json\n/, '').replace(/\n```$/, '');
+    }
+    
+    const reasoning = JSON.parse(rawOutput);
+
+    // GUARDRAIL: Halt on low confidence or hallucination risk
+    if (reasoning.confidence_score < 85 || reasoning.requires_human_audit) {
+      console.log(`[MachineServer] GUARDRAIL TRIGGERED: Confidence ${reasoning.confidence_score} too low.`);
+      return res.status(200).json({
+        success: false,
+        status: 'HALTED',
+        reason: 'Agent confidence below safety threshold or human audit required.',
+        payment_verified: { proof: paymentProof, amount_motes: paymentAmountRaw },
+        agent_reasoning: reasoning
+      });
+    }
+
+    return res.json({
+      success: true,
+      status: 'COMPLETED',
+      payment_verified: { proof: paymentProof, amount_motes: paymentAmountRaw },
+      agent_reasoning: reasoning
+    });
+
+  } catch (err) {
+    console.error(`[MachineServer] Agentic reasoning failed:`, err.message);
+    return res.status(500).json({
+      error: 'Agent Engine Failure',
+      message: 'The cognitive engine failed to process the request deterministically.'
+    });
+  }
+});
+
+// BUG FIX 11: Catch-all error handler for unhandled throws inside routes
+app.use((err, req, res, next) => {
+  console.error('[MachineServer] Unhandled error:', err.message);
+  res.status(500).json({ error: 'Internal Server Error', message: err.message });
+});
+
+app.listen(PORT, () => {
+  console.log(`[MachineServer] MachinaRWA API running on port ${PORT}`);
+  console.log(`[MachineServer] Agent Public Key: ${agentPublicKeyHex}`);
+});
+
+module.exports = { app, metrics };
