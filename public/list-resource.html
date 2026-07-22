@@ -8,14 +8,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090e18;
-      --panel: #0d1422;
-      --panel-hover: #131c2e;
-      --border: #1e2c44;
+      --bg: #07090e;
+      --panel: #0d121c;
+      --panel-hover: #131b2a;
+      --border: #1b263b;
       --text: #ecdcb9;
-      --text-muted: #8ea1b5;
+      --text-muted: #8496a8;
       --accent-gold: #d4a964;
       --accent-teal: #3ba792;
+      --accent-rose: #e65565;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -35,9 +36,9 @@
 
     .nav-header {
       border-bottom: 1px solid var(--border);
-      background: rgba(9, 14, 24, 0.92);
+      background: rgba(7, 9, 14, 0.95);
       backdrop-filter: blur(16px);
-      padding: 0 32px;
+      padding: 0 40px;
       height: 64px;
       display: flex;
       align-items: center;
@@ -64,18 +65,19 @@
     
     .btn-gold {
       background: var(--accent-gold);
-      color: #090e18;
+      color: #07090e;
       border: 1px solid var(--accent-gold);
       font-weight: 700;
     }
+    .btn-gold:hover { background: #c2954f; border-color: #c2954f; }
 
     .input {
       width: 100%;
-      background: #05080f;
+      background: #04060a;
       color: var(--text);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 12px 16px;
       font-size: 13px;
       font-family: 'JetBrains Mono', monospace;
     }
@@ -85,14 +87,24 @@
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 28px;
+      padding: 32px;
+    }
+
+    .shareholder-card {
+      background: #04060a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .footer {
       margin-top: auto;
       border-top: 1px solid var(--border);
-      background: rgba(9, 14, 24, 0.95);
-      padding: 40px 32px 32px;
+      background: rgba(7, 9, 14, 0.95);
+      padding: 40px 40px 32px;
     }
   </style>
 </head>
@@ -100,41 +112,42 @@
 
   <!-- Top Navigation -->
   <nav class="nav-header">
-    <div style="display:flex;align-items:center;gap:12px;">
+    <div style="display:flex;align-items:center;gap:14px;">
       <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;">
-        <div style="width:36px;height:36px;background:var(--accent-gold);color:#090e18;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">M</div>
+        <div style="width:36px;height:36px;background:var(--accent-gold);color:#07090e;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">M</div>
         <span style="font-weight:800;font-size:16px;letter-spacing:-0.3px;color:var(--text);">Machine RWA</span>
       </a>
-      <span style="font-size:11px;color:var(--accent-teal);margin-left:8px;" class="mono">Resource Listing Portal</span>
+      <span style="font-size:11px;color:var(--accent-teal);" class="mono">Resource Listing Portal</span>
     </div>
 
-    <div style="display:flex;align-items:center;gap:12px;">
+    <div style="display:flex;align-items:center;gap:14px;">
       <a href="compute.html" class="btn">Compute Marketplace</a>
       <a href="operator.html" class="btn">Operator Dashboard</a>
     </div>
   </nav>
 
-  <!-- Hardware Listing Form View -->
-  <main style="max-width:760px;margin:40px auto 64px;padding:0 24px;">
+  <!-- Spacious 2-Column Hardware Listing View -->
+  <main style="max-width:1200px;margin:36px auto 64px;padding:0 32px;display:grid;grid-template-columns:1fr 400px;gap:32px;">
     
+    <!-- Left Column: Primary Registration Form -->
     <div class="card">
-      <div style="margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);">
-        <h1 style="font-size:22px;font-weight:800;color:#fff;">List Hardware Compute Resource</h1>
-        <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">
-          Register a physical machine node (CPU Inference, IoT Sensor, Solar Telemetry, Compute Pool) into the Casper DePIN franchise network.
+      <div style="margin-bottom:28px;padding-bottom:18px;border-bottom:1px solid var(--border);">
+        <h1 style="font-size:26px;font-weight:800;color:#fff;">List Physical Hardware Resource</h1>
+        <p style="font-size:14px;color:var(--text-muted);margin-top:4px;">
+          Register your physical machine node into the Casper DePIN franchise network and define your yield payout weights.
         </p>
       </div>
 
-      <form id="resource-form" onsubmit="handleResourceSubmit(event)" style="display:flex;flex-direction:column;gap:18px;">
+      <form id="resource-form" onsubmit="handleResourceSubmit(event)" style="display:flex;flex-direction:column;gap:22px;">
         
         <div>
-          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">Node Hardware Title</label>
-          <input type="text" id="node-title" value="Machine-Node-Alpha (CPU Quantitative Inference)" class="input" required>
+          <label style="display:block;font-size:12px;font-weight:700;color:var(--accent-gold);margin-bottom:8px;" class="mono">01. HARDWARE RESOURCE TITLE</label>
+          <input type="text" id="node-title" value="Machine-Node-Alpha (CPU Quantitative Inference)" class="input" placeholder="e.g. NVIDIA RTX 4090 / Solar Oracle #04" required>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
           <div>
-            <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">Category / Infrastructure Type</label>
+            <label style="display:block;font-size:12px;font-weight:700;color:var(--accent-teal);margin-bottom:8px;" class="mono">02. INFRASTRUCTURE TYPE</label>
             <select id="node-category" class="input" style="cursor:pointer;">
               <option value="CPU Quantitative Inference Node">CPU Quantitative Inference Node</option>
               <option value="IoT Solar & Sensor Telemetry Oracle">IoT Solar & Sensor Telemetry Oracle</option>
@@ -143,44 +156,80 @@
             </select>
           </div>
           <div>
-            <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">Minimum Fee per Request (motes)</label>
+            <label style="display:block;font-size:12px;font-weight:700;color:var(--accent-gold);margin-bottom:8px;" class="mono">03. MINIMUM FEE (MOTES)</label>
             <input type="number" id="node-fee" value="1000000000" class="input" required>
           </div>
         </div>
 
         <div>
-          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">Casper Shareholder Account Addresses & Weight Splits</label>
-          <div style="display:flex;flex-direction:column;gap:10px;">
-            <div style="display:grid;grid-template-columns:3fr 1fr;gap:10px;">
-              <input type="text" value="01c238bdf5a5dbfb2b7692cd01828f26687a49c2182fb5b8403b262709e0d324b9" class="input" readonly>
-              <input type="number" value="60" class="input" readonly style="color:var(--accent-gold);text-align:center;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <label style="font-size:12px;font-weight:700;color:var(--accent-gold);" class="mono">04. SHAREHOLDER WALLET RECIPIENTS & WEIGHTS</label>
+            <button type="button" onclick="addShareholderCard()" class="btn" style="padding:6px 12px;font-size:11px;">+ Add Recipient Wallet</button>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px;" id="shareholders-container">
+            
+            <div class="shareholder-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:11px;font-weight:700;color:var(--accent-gold);" class="mono">RECIPIENT #1 (OPERATOR NODE)</span>
+                <span style="font-size:11px;color:var(--accent-teal);" class="mono">AUTO-DETECTED WALLET</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 140px;gap:12px;">
+                <input type="text" class="input sh-address" id="operator-wallet-input" value="01c238bdf5a5dbfb2b7692cd01828f26687a49c2182fb5b8403b262709e0d324b9" placeholder="01... Casper Account" required>
+                <input type="number" class="input sh-share" value="60" placeholder="Share %" min="1" max="100" required style="color:var(--accent-gold);text-align:center;">
+              </div>
             </div>
-            <div style="display:grid;grid-template-columns:3fr 1fr;gap:10px;">
-              <input type="text" value="015fe42d789a12887d77ebaed26687a49c2182fb5b8403b262709e0d324b999990" class="input" readonly>
-              <input type="number" value="40" class="input" readonly style="color:var(--accent-teal);text-align:center;">
+
+            <div class="shareholder-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:11px;font-weight:700;color:var(--accent-teal);" class="mono">RECIPIENT #2 (BACKER FRACTIONAL POOL)</span>
+                <button type="button" onclick="this.closest('.shareholder-card').remove()" style="background:none;border:none;color:var(--accent-rose);cursor:pointer;font-size:12px;">Remove</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 140px;gap:12px;">
+                <input type="text" class="input sh-address" value="015fe42d789a12887d77ebaed26687a49c2182fb5b8403b262709e0d324b999990" placeholder="01... Casper Account" required>
+                <input type="number" class="input sh-share" value="40" placeholder="Share %" min="1" max="100" required style="color:var(--accent-teal);text-align:center;">
+              </div>
             </div>
+
           </div>
         </div>
 
-        <div style="padding-top:10px;">
-          <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;font-size:14px;">
-            Publish Hardware Listing to Casper DePIN Network
+        <div style="padding-top:12px;">
+          <button type="submit" id="btn-submit-listing" class="btn btn-gold" style="width:100%;justify-content:center;padding:14px;font-size:14px;">
+            Save & Deploy Configuration to Node
           </button>
         </div>
 
-        <div id="status-msg" style="display:none;padding:12px;background:#05080f;border:1px solid var(--accent-teal);border-radius:8px;color:var(--accent-teal);font-size:12px;" class="mono"></div>
+        <div id="status-msg" style="display:none;padding:14px;background:#04060a;border:1px solid var(--accent-teal);border-radius:8px;color:var(--accent-teal);font-size:12px;" class="mono"></div>
 
       </form>
+    </div>
+
+    <!-- Right Column: Protocol Guidelines & Wallet Identity -->
+    <div style="display:flex;flex-direction:column;gap:24px;">
+      
+      <div class="card">
+        <h3 style="font-size:16px;font-weight:700;color:#fff;margin-bottom:12px;">Casper Shareholder Policy</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
+          When x402 revenue accumulated by your machine reaches <strong style="color:var(--accent-gold);">5.0 CSPR</strong>, the local daemon automatically executes proportional CSPR transfer deploys to every listed address.
+        </p>
+
+        <div style="padding:14px;background:#04060a;border:1px solid var(--border);border-radius:8px;font-size:12px;" class="mono">
+          <div style="color:var(--accent-teal);margin-bottom:4px;">Connected Operator Wallet:</div>
+          <div id="active-operator-display" style="word-break:break-all;color:var(--text-muted);">01c238...324b9</div>
+        </div>
+      </div>
+
     </div>
 
   </main>
 
   <!-- Complete Site Footer -->
   <footer class="footer">
-    <div style="max-width:1150px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:32px;">
+    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:32px;">
       <div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <div style="width:28px;height:28px;background:var(--accent-gold);color:#090e18;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">M</div>
+          <div style="width:28px;height:28px;background:var(--accent-gold);color:#07090e;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">M</div>
           <span style="font-weight:800;font-size:16px;color:#fff;">Machine RWA</span>
         </div>
         <p style="font-size:13px;color:var(--text-muted);max-width:320px;">
@@ -214,20 +263,78 @@
       </div>
     </div>
 
-    <div style="max-width:1150px;margin:0 auto;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);" class="mono">
+    <div style="max-width:1200px;margin:0 auto;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);" class="mono">
       <span>© 2026 Machine RWA • Built on Casper Blockchain</span>
       <span>Network Status: Testnet Connected</span>
     </div>
   </footer>
 
   <script>
+    const activeWallet = localStorage.getItem('connected_casper_wallet');
+    if (activeWallet) {
+      document.getElementById('operator-wallet-input').value = activeWallet;
+      document.getElementById('active-operator-display').textContent = activeWallet;
+    }
+
+    function addShareholderCard() {
+      const container = document.getElementById('shareholders-container');
+      const count = container.children.length + 1;
+      const card = document.createElement('div');
+      card.className = 'shareholder-card';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;font-weight:700;color:var(--accent-gold);" class="mono">RECIPIENT #${count}</span>
+          <button type="button" onclick="this.closest('.shareholder-card').remove()" style="background:none;border:none;color:var(--accent-rose);cursor:pointer;font-size:12px;">Remove</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 140px;gap:12px;">
+          <input type="text" class="input sh-address" placeholder="01... Casper Account" required>
+          <input type="number" class="input sh-share" placeholder="Share %" min="1" max="100" required style="color:var(--accent-teal);text-align:center;">
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
     async function handleResourceSubmit(e) {
       e.preventDefault();
-      const title = document.getElementById('node-title').value;
-      const msg = document.getElementById('status-msg');
-      msg.style.display = 'block';
-      msg.textContent = `✅ Successfully registered hardware resource: "${title}" on Casper DePIN Network! Redirecting to Operator Dashboard...`;
-      setTimeout(() => { window.location.href = 'operator.html'; }, 2000);
+      const btn = document.getElementById('btn-submit-listing');
+      btn.disabled = true;
+      btn.textContent = 'Saving Shareholder Configuration to Backend...';
+
+      const addresses = document.querySelectorAll('.sh-address');
+      const shares = document.querySelectorAll('.sh-share');
+
+      const shareholders = [];
+      for (let i = 0; i < addresses.length; i++) {
+        const addr = addresses[i].value.trim();
+        const shareNum = parseInt(shares[i].value);
+        if (addr && !isNaN(shareNum)) {
+          shareholders.push({ address: addr, share: shareNum });
+        }
+      }
+
+      try {
+        const res = await fetch('/api/config/shareholders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shareholders })
+        });
+        const data = await res.json();
+
+        const msg = document.getElementById('status-msg');
+        msg.style.display = 'block';
+        if (res.ok && data.success) {
+          msg.textContent = `✅ Successfully saved ${shareholders.length} dynamic shareholder wallet accounts to node! Redirecting to Operator Dashboard...`;
+          setTimeout(() => { window.location.href = 'operator.html'; }, 1800);
+        } else {
+          msg.textContent = `❌ Error: ${data.error || 'Failed to update shareholders'}`;
+          btn.disabled = false;
+          btn.textContent = 'Save & Deploy Configuration to Node';
+        }
+      } catch (err) {
+        alert(`Failed to save config: ${err.message}`);
+        btn.disabled = false;
+        btn.textContent = 'Save & Deploy Configuration to Node';
+      }
     }
   </script>
 
