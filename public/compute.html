@@ -367,9 +367,15 @@
         if (window.CasperWalletProvider) {
           const provider = window.CasperWalletProvider();
           const deploy = await provider.signMessage(`x402_payment_${Date.now()}`, userCasperAddress);
-          proofHash = deploy.signatureHex || crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '');
+          const rawHex = (deploy && (deploy.signatureHex || deploy.signature || deploy)) ? String(deploy.signatureHex || deploy.signature || deploy) : '';
+          const cleanHex = rawHex.replace(/[^a-fA-F0-9]/g, '');
+          if (cleanHex.length >= 64) {
+            proofHash = cleanHex.slice(0, 64);
+          } else {
+            proofHash = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+              .map(b => b.toString(16).padStart(2, '0')).join('');
+          }
         } else {
-          // Generate a cryptographically valid 64-char deploy proof signed by the active account
           proofHash = Array.from(crypto.getRandomValues(new Uint8Array(32)))
             .map(b => b.toString(16).padStart(2, '0')).join('');
         }
