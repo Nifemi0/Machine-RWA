@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>List Hardware Resource — Machine RWA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090e18;
+      --panel: #0d1422;
+      --panel-hover: #131c2e;
+      --border: #1e2c44;
+      --text: #ecdcb9;
+      --text-muted: #8ea1b5;
+      --accent-gold: #d4a964;
+      --accent-teal: #3ba792;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    .nav-header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(9, 14, 24, 0.92);
+      backdrop-filter: blur(16px);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+    }
+
+    .btn {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .btn:hover { background: var(--panel-hover); border-color: var(--accent-gold); }
+    
+    .btn-gold {
+      background: var(--accent-gold);
+      color: #090e18;
+      border: 1px solid var(--accent-gold);
+      font-weight: 700;
+    }
+
+    .input {
+      width: 100%;
+      background: #05080f;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .input:focus { outline: none; border-color: var(--accent-gold); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+    }
+
+    .footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      background: rgba(9, 14, 24, 0.95);
+      padding: 40px 32px 32px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="nav-header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;background:var(--accent-gold);color:#090e18;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">M</div>
+        <span style="font-weight:800;font-size:16px;letter-spacing:-0.3px;color:var(--text);">Machine RWA</span>
+      </a>
+      <span style="font-size:11px;color:var(--accent-teal);margin-left:8px;" class="mono">Resource Listing Portal</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="compute.html" class="btn">Compute Marketplace</a>
+      <a href="operator.html" class="btn">Operator Dashboard</a>
+    </div>
+  </nav>
+
+  <!-- Hardware Listing Form View -->
+  <main style="max-width:760px;margin:40px auto 64px;padding:0 24px;">
+    
+    <div class="card">
+      <div style="margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+        <h1 style="font-size:22px;font-weight:800;color:#fff;">List Hardware Compute Resource</h1>
+        <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">
+          Register a physical machine node (CPU Inference, IoT Sensor, Solar Telemetry, Compute Pool) into the Casper DePIN franchise network.
+        </p>
+      </div>
+
+      <form id="resource-form" onsubmit="handleResourceSubmit(event)" style="display:flex;flex-direction:column;gap:18px;">
+        
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">Node Hardware Title</label>
+          <input type="text" id="node-title" value="Machine-Node-Alpha (CPU Quantitative Inference)" class="input" required>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">Category / Infrastructure Type</label>
+            <select id="node-category" class="input" style="cursor:pointer;">
+              <option value="CPU Quantitative Inference Node">CPU Quantitative Inference Node</option>
+              <option value="IoT Solar & Sensor Telemetry Oracle">IoT Solar & Sensor Telemetry Oracle</option>
+              <option value="Render & Compute Cluster">Render & Compute Cluster</option>
+              <option value="Custom Hardware Franchise">Custom Hardware Franchise</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">Minimum Fee per Request (motes)</label>
+            <input type="number" id="node-fee" value="1000000000" class="input" required>
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">Casper Shareholder Account Addresses & Weight Splits</label>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:grid;grid-template-columns:3fr 1fr;gap:10px;">
+              <input type="text" value="01c238bdf5a5dbfb2b7692cd01828f26687a49c2182fb5b8403b262709e0d324b9" class="input" readonly>
+              <input type="number" value="60" class="input" readonly style="color:var(--accent-gold);text-align:center;">
+            </div>
+            <div style="display:grid;grid-template-columns:3fr 1fr;gap:10px;">
+              <input type="text" value="015fe42d789a12887d77ebaed26687a49c2182fb5b8403b262709e0d324b999990" class="input" readonly>
+              <input type="number" value="40" class="input" readonly style="color:var(--accent-teal);text-align:center;">
+            </div>
+          </div>
+        </div>
+
+        <div style="padding-top:10px;">
+          <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;font-size:14px;">
+            Publish Hardware Listing to Casper DePIN Network
+          </button>
+        </div>
+
+        <div id="status-msg" style="display:none;padding:12px;background:#05080f;border:1px solid var(--accent-teal);border-radius:8px;color:var(--accent-teal);font-size:12px;" class="mono"></div>
+
+      </form>
+    </div>
+
+  </main>
+
+  <!-- Complete Site Footer -->
+  <footer class="footer">
+    <div style="max-width:1150px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:32px;">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <div style="width:28px;height:28px;background:var(--accent-gold);color:#090e18;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">M</div>
+          <span style="font-weight:800;font-size:16px;color:#fff;">Machine RWA</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);max-width:320px;">
+          DePIN hardware tokenization operating system on Casper Network. Built for Casper Agentic Buildathon 2026.
+        </p>
+      </div>
+
+      <div>
+        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Product</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <a href="compute.html" style="color:var(--text-muted);text-decoration:none;">Compute Marketplace</a>
+          <a href="list-resource.html" style="color:var(--text-muted);text-decoration:none;">List Hardware Resource</a>
+          <a href="operator.html" style="color:var(--text-muted);text-decoration:none;">Operator Dashboard</a>
+        </div>
+      </div>
+
+      <div>
+        <h4 style="font-size:12px;font-weight:700;color:var(--accent-teal);text-transform:uppercase;margin-bottom:12px;" class="mono">Casper Ecosystem</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <a href="https://cspr.click" target="_blank" style="color:var(--text-muted);text-decoration:none;">CSPR.click AI Skill</a>
+          <a href="https://testnet.cspr.live" target="_blank" style="color:var(--text-muted);text-decoration:none;">Casper Testnet Explorer</a>
+        </div>
+      </div>
+
+      <div>
+        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Developers</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <a href="https://github.com/Nifemi0/Machine-RWA" target="_blank" style="color:var(--text-muted);text-decoration:none;">GitHub Repository</a>
+          <a href="/status" target="_blank" style="color:var(--text-muted);text-decoration:none;">JSON Telemetry Endpoint</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width:1150px;margin:0 auto;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);" class="mono">
+      <span>© 2026 Machine RWA • Built on Casper Blockchain</span>
+      <span>Network Status: Testnet Connected</span>
+    </div>
+  </footer>
+
+  <script>
+    async function handleResourceSubmit(e) {
+      e.preventDefault();
+      const title = document.getElementById('node-title').value;
+      const msg = document.getElementById('status-msg');
+      msg.style.display = 'block';
+      msg.textContent = `✅ Successfully registered hardware resource: "${title}" on Casper DePIN Network! Redirecting to Operator Dashboard...`;
+      setTimeout(() => { window.location.href = 'operator.html'; }, 2000);
+    }
+  </script>
+
+</body>
+</html>

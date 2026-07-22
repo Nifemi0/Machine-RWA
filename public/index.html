@@ -27,20 +27,41 @@
       font-size: 14px;
       line-height: 1.6;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .mono { font-family: 'JetBrains Mono', monospace; }
 
-    .nav-header {
+    /* Full-width Hero Artwork Header */
+    .full-header-container {
+      position: relative;
+      width: 100%;
+      height: 520px;
+      overflow: hidden;
       border-bottom: 1px solid var(--border);
-      background: rgba(9, 14, 24, 0.92);
-      backdrop-filter: blur(16px);
-      padding: 0 32px;
-      height: 64px;
+    }
+    .full-header-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .full-header-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(9,14,24,0.3) 0%, rgba(9,14,24,0.85) 70%, rgba(9,14,24,1) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 40px;
+    }
+
+    .nav-header-transparent {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: sticky; top: 0; z-index: 50;
+      width: 100%;
     }
 
     .btn {
@@ -75,97 +96,132 @@
       padding: 28px;
     }
 
-    .hero-banner-container {
-      position: relative;
-      width: 100%;
-      height: 420px;
-      overflow: hidden;
-      border-bottom: 1px solid var(--border);
-    }
-    .hero-banner-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-    }
-    .hero-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom, rgba(9,14,24,0.1) 0%, rgba(9,14,24,0.85) 75%, rgba(9,14,24,1) 100%);
-      display: flex;
-      align-items: flex-end;
-      padding: 40px 32px;
+    .footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      background: rgba(9, 14, 24, 0.95);
+      padding: 40px 32px 32px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation -->
-  <nav class="nav-header">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div style="width:36px;height:36px;background:var(--accent-gold);color:#090e18;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">M</div>
-      <div>
-        <span style="font-weight:800;font-size:16px;letter-spacing:-0.3px;color:var(--text);">Machine RWA</span>
-        <span style="font-size:11px;color:var(--accent-teal);margin-left:8px;" class="mono">Casper Testnet DePIN</span>
-      </div>
-    </div>
+  <!-- Full Header with Artwork as Background -->
+  <div class="full-header-container">
+    <img src="hero.jpeg" alt="Machine RWA Dithered Landscape Artwork Header" class="full-header-img">
+    <div class="full-header-overlay">
+      
+      <!-- Top Transparent Navigation -->
+      <nav class="nav-header-transparent">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;background:var(--accent-gold);color:#090e18;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">M</div>
+          <div>
+            <span style="font-weight:800;font-size:16px;letter-spacing:-0.3px;color:#fff;">Machine RWA</span>
+            <span style="font-size:11px;color:var(--accent-teal);margin-left:8px;" class="mono">Casper Testnet DePIN</span>
+          </div>
+        </div>
 
-    <div style="display:flex;align-items:center;gap:12px;">
-      <a href="compute.html" class="btn btn-gold">Launch Compute Portal</a>
-      <a href="operator.html" class="btn">Operator Dashboard</a>
-    </div>
-  </nav>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <a href="compute.html" class="btn btn-gold">Compute Marketplace</a>
+          <a href="list-resource.html" class="btn">List Hardware Resource</a>
+          <a href="operator.html" class="btn">Operator Dashboard</a>
+        </div>
+      </nav>
 
-  <!-- Hero Banner -->
-  <div class="hero-banner-container">
-    <img src="hero.jpeg" alt="Machine RWA Header Artwork" class="hero-banner-img">
-    <div class="hero-overlay">
-      <div style="max-width:840px;">
-        <span style="display:inline-block;font-size:11px;font-weight:700;color:var(--accent-gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;" class="mono">
-          Casper Agentic Buildathon 2026 • Production DePIN Architecture
+      <!-- Hero Text Content -->
+      <div style="max-width:860px;margin-bottom:20px;">
+        <span style="display:inline-block;font-size:11px;font-weight:700;color:var(--accent-gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px;" class="mono">
+          Casper Agentic Buildathon 2026 • DePIN Protocol Blueprint
         </span>
-        <h1 style="font-size:38px;font-weight:800;letter-spacing:-1px;line-height:1.15;color:#fff;margin-bottom:12px;">
+        <h1 style="font-size:42px;font-weight:800;letter-spacing:-1.2px;line-height:1.15;color:#fff;margin-bottom:14px;">
           Tokenized Physical Hardware & Autonomous Yield Franchises.
         </h1>
-        <p style="font-size:16px;color:var(--text);opacity:0.9;margin-bottom:20px;">
+        <p style="font-size:16px;color:var(--text);opacity:0.95;margin-bottom:24px;max-width:760px;">
           Transforming physical machine compute into yield-bearing Real World Assets. AI agents pay per request via native <strong style="color:var(--accent-gold);">x402 HTTP Micropayments</strong>, while autonomous daemons disburse yield to Casper Testnet shareholders.
         </p>
-        <div style="display:flex;gap:12px;">
-          <a href="compute.html" class="btn btn-gold" style="padding:12px 22px;">Execute x402 Compute Job</a>
-          <a href="operator.html" class="btn" style="padding:12px 22px;">Manage Node Telemetry</a>
+        <div style="display:flex;gap:14px;">
+          <a href="compute.html" class="btn btn-gold" style="padding:12px 24px;font-size:14px;">Execute x402 Compute Job</a>
+          <a href="list-resource.html" class="btn" style="padding:12px 24px;font-size:14px;">List Hardware Resource</a>
         </div>
       </div>
+
     </div>
   </div>
 
-  <!-- Key Architecture Features Grid -->
-  <section style="max-width:1100px;margin:48px auto;padding:0 24px;display:grid;grid-template-columns:repeat(3, 1fr);gap:24px;">
+  <!-- Key Architecture Features Grid (Zero Emojis) -->
+  <section style="max-width:1150px;margin:56px auto;padding:0 24px;display:grid;grid-template-columns:repeat(3, 1fr);gap:24px;">
     
     <div class="card">
-      <span style="font-size:24px;margin-bottom:12px;display:block;">⚡</span>
-      <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">x402 Micropayments</h3>
+      <div style="font-size:11px;font-weight:700;color:var(--accent-gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;" class="mono">Protocol Core 01</div>
+      <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;color:#fff;">x402 HTTP Micropayments</h3>
       <p style="font-size:13px;color:var(--text-muted);">
         Accountless machine-to-machine commerce using native HTTP headers (`x-payment-proof` and `x-payment-amount`) verified on Casper Testnet.
       </p>
     </div>
 
     <div class="card">
-      <span style="font-size:24px;margin-bottom:12px;display:block;">🤖</span>
-      <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">Quantitative Guardrails</h3>
+      <div style="font-size:11px;font-weight:700;color:var(--accent-teal);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;" class="mono">Protocol Core 02</div>
+      <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;color:#fff;">Quantitative Guardrails</h3>
       <p style="font-size:13px;color:var(--text-muted);">
         Deterministic AI reasoning self-scores confidence and automatically halts suspicious or hallucinated payload executions.
       </p>
     </div>
 
     <div class="card">
-      <span style="font-size:24px;margin-bottom:12px;display:block;">💸</span>
-      <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">Autonomous Yield Daemon</h3>
+      <div style="font-size:11px;font-weight:700;color:var(--accent-gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;" class="mono">Protocol Core 03</div>
+      <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;color:#fff;">Autonomous Yield Daemon</h3>
       <p style="font-size:13px;color:var(--text-muted);">
         Background daemon monitors revenue accumulation and signs proportional CSPR payouts to fractional RWA shareholders.
       </p>
     </div>
 
   </section>
+
+  <!-- Complete Site Footer with Necessary Links -->
+  <footer class="footer">
+    <div style="max-width:1150px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:32px;">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <div style="width:28px;height:28px;background:var(--accent-gold);color:#090e18;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">M</div>
+          <span style="font-weight:800;font-size:16px;color:#fff;">Machine RWA</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);max-width:320px;">
+          DePIN hardware tokenization operating system on Casper Network. Built for Casper Agentic Buildathon 2026.
+        </p>
+      </div>
+
+      <div>
+        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Product</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <a href="compute.html" style="color:var(--text-muted);text-decoration:none;">Compute Marketplace</a>
+          <a href="list-resource.html" style="color:var(--text-muted);text-decoration:none;">List Hardware Resource</a>
+          <a href="operator.html" style="color:var(--text-muted);text-decoration:none;">Operator Dashboard</a>
+        </div>
+      </div>
+
+      <div>
+        <h4 style="font-size:12px;font-weight:700;color:var(--accent-teal);text-transform:uppercase;margin-bottom:12px;" class="mono">Casper Ecosystem</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <a href="https://cspr.click" target="_blank" style="color:var(--text-muted);text-decoration:none;">CSPR.click AI Skill</a>
+          <a href="https://testnet.cspr.live" target="_blank" style="color:var(--text-muted);text-decoration:none;">Casper Testnet Explorer</a>
+          <a href="https://rpc.testnet.casper.network" target="_blank" style="color:var(--text-muted);text-decoration:none;">Testnet RPC Gateway</a>
+        </div>
+      </div>
+
+      <div>
+        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Developers</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <a href="https://github.com/Nifemi0/Machine-RWA" target="_blank" style="color:var(--text-muted);text-decoration:none;">GitHub Repository</a>
+          <a href="/status" target="_blank" style="color:var(--text-muted);text-decoration:none;">JSON Telemetry Endpoint</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width:1150px;margin:0 auto;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);" class="mono">
+      <span>© 2026 Machine RWA • Built on Casper Blockchain</span>
+      <span>Network Status: Testnet Connected</span>
+    </div>
+  </footer>
 
 </body>
 </html>
