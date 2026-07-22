@@ -400,7 +400,15 @@
           headers,
           body: JSON.stringify({ jobInput: body })
         });
-        const data = await res.json();
+        
+        const contentType = res.headers.get('content-type') || '';
+        let data;
+        if (contentType.includes('application/json')) {
+          data = await res.json();
+        } else {
+          const textText = await res.text();
+          data = { error: 'Server Error', message: textText.slice(0, 100) };
+        }
 
         if (res.ok && data.success) {
           log(`Job Completed · Risk: ${data.agent_reasoning?.risk_level} · Confidence: ${data.agent_reasoning?.confidence_score}`, 'success');
@@ -412,7 +420,7 @@
           log(`${res.status} ${data.error || 'Failed'} — ${data.message || ''}`, 'error');
         }
       } catch (e) {
-        log(`Network error: ${e.message}`, 'error');
+        log(`Execution error: ${e.message}`, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = 'Pay 1 CSPR & Execute x402 Compute';
