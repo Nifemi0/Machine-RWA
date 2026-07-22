@@ -193,8 +193,8 @@
               <input type="number" id="sim-amount" value="1000000000" class="input">
             </div>
             <div>
-              <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Minimum Required Fee</label>
-              <div class="input" style="color:var(--text-muted);">1,000,000,000 motes (1 CSPR)</div>
+              <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">x-api-key (Optional BYOK Key)</label>
+              <input type="password" id="sim-key" placeholder="sk-..." class="input">
             </div>
           </div>
 
@@ -330,18 +330,22 @@
 
       const proof  = document.getElementById('sim-proof').value;
       const amount = document.getElementById('sim-amount').value;
+      const apiKey = document.getElementById('sim-key').value;
       const body   = document.getElementById('sim-payload').value;
 
       log(`POST /api/compute — ${amount} motes`);
 
+      const headers = {
+        'Content-Type': 'application/json',
+        'x-payment-proof': proof,
+        'x-payment-amount': amount
+      };
+      if (apiKey) headers['x-api-key'] = apiKey;
+
       try {
         const res = await fetch('/api/compute', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-payment-proof': proof,
-            'x-payment-amount': amount
-          },
+          headers,
           body: JSON.stringify({ jobInput: body })
         });
         const data = await res.json();

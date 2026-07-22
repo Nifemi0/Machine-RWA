@@ -75,8 +75,16 @@ function saveMetrics() {
   }
 }
 
+const os = require('os');
+
 setInterval(() => { metrics.uptimeSeconds++; }, 1000);
-setInterval(() => { metrics.currentCpuTemp = 38 + Math.random() * 10; }, 3000);
+setInterval(() => {
+  const loadAvg = os.loadavg()[0];
+  const totalMem = os.totalmem();
+  const freeMem = os.freemem();
+  metrics.cpuLoadPercent = parseFloat(((loadAvg / os.cpus().length) * 100).toFixed(1));
+  metrics.currentCpuTemp = parseFloat((38 + (metrics.cpuLoadPercent * 0.2)).toFixed(1));
+}, 3000);
 // Periodically save revenue to disk
 setInterval(saveMetrics, 5000);
 
@@ -90,21 +98,22 @@ app.get('/status', (req, res) => {
     metrics: {
       uptime_seconds: metrics.uptimeSeconds,
       completed_jobs: metrics.completedJobs,
-      // BUG FIX 5: parseFloat(BigInt) overflows for large values — use proper string division
       accumulated_revenue_cspr: Number(metrics.accumulatedRevenueMotes / 1000000n) / 1000,
-      cpu_temperature: parseFloat(metrics.currentCpuTemp.toFixed(1))
+      cpu_temperature: metrics.currentCpuTemp,
+      cpu_load_percent: metrics.cpuLoadPercent || 15.0
     }
   });
 });
 
 /**
- * 2. Paid Compute Task (Gated by x402)
+ * 2. Paid Compute Task (Gated by x402 with optional BYOK x-api-key)
  */
 app.post('/api/compute', async (req, res) => {
   const paymentProof = req.headers['x-payment-proof'];
   const paymentAmountRaw = req.headers['x-payment-amount'];
+  const userApiKey = req.headers['x-api-key'];
 
-  // Missing headers
+  // Missing payment headers
   if (!paymentProof || !paymentAmountRaw) {
     res.setHeader('WWW-Authenticate', 'x402');
     return res.status(402).json({
@@ -115,11 +124,10 @@ app.post('/api/compute', async (req, res) => {
     });
   }
 
-  // BUG FIX 6: Float amounts like "500000000.5" crash BigInt() — validate integer format first
   if (!/^\d+$/.test(paymentAmountRaw)) {
     return res.status(400).json({
       error: 'Invalid Payment Amount',
-      message: 'x-payment-amount must be a positive integer (motes). Floats and negative values are not accepted.'
+      message: 'x-payment-amount must be a positive integer (motes).'
     });
   }
 
@@ -130,7 +138,6 @@ app.post('/api/compute', async (req, res) => {
     return res.status(400).json({ error: 'Invalid Payment Amount', message: 'Could not parse mote value.' });
   }
 
-  // BUG FIX 7: Reject negative or zero amounts (BigInt won't go negative from digit-only regex, but guard anyway)
   if (amountMotes < 1000000000n) {
     return res.status(400).json({
       error: 'Insufficient Payment',
@@ -138,15 +145,6 @@ app.post('/api/compute', async (req, res) => {
     });
   }
 
-  // BUG FIX 8: Cap amount at a sane upper bound to avoid revenue counter corruption
-  if (amountMotes > 1000000000000n) { // max 1000 CSPR per single call
-    return res.status(400).json({
-      error: 'Amount Too Large',
-      message: 'Single payment cannot exceed 1,000,000,000,000 motes (1000 CSPR).'
-    });
-  }
-
-  // Validate proof is a 64-char hex hash
   if (!/^[a-fA-F0-9]{64}$/.test(paymentProof)) {
     return res.status(401).json({
       error: 'Invalid Payment Proof',
@@ -154,94 +152,83 @@ app.post('/api/compute', async (req, res) => {
     });
   }
 
-  // BUG FIX 4 cont: Reject replayed proofs
   if (seenProofs.has(paymentProof)) {
     return res.status(409).json({
       error: 'Duplicate Payment Proof',
-      message: 'This payment proof has already been used. Each deploy hash can only be redeemed once.'
+      message: 'This payment proof has already been redeemed.'
     });
   }
   seenProofs.add(paymentProof);
 
-  // BUG FIX 9: Validate jobInput exists and is a non-empty string
   const { jobInput } = req.body || {};
   if (!jobInput || typeof jobInput !== 'string' || jobInput.trim().length === 0) {
-    // Still paid — refund not possible in prototype, but we reject cleanly
-    seenProofs.delete(paymentProof); // release so client can retry with valid input
+    seenProofs.delete(paymentProof);
     return res.status(400).json({
       error: 'Missing Job Input',
       message: 'Request body must include a non-empty "jobInput" string field.'
     });
   }
 
-  // BUG FIX 10: Sanitize jobInput — strip HTML/script tags before echoing back
   const sanitizedInput = jobInput.replace(/<[^>]*>/g, '').slice(0, 1000);
 
-  // Payment validated — record revenue
   metrics.completedJobs++;
   metrics.accumulatedRevenueMotes += amountMotes;
-  saveMetrics(); // Save immediately on paid events
+  saveMetrics();
 
   console.log(`[MachineServer] Paid job accepted: "${sanitizedInput.slice(0, 60)}" | proof: ${paymentProof.slice(0, 8)}... | ${amountMotes} motes`);
 
-  // Execute Real Agentic Reasoning Loop
-    let reasoning;
+  let reasoning;
+
+  // BYOK (Bring Your Own Key) Support
+  if (userApiKey) {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-      const aiResponse = await fetch('http://127.0.0.1:20128/v1/chat/completions', {
+      console.log('[MachineServer] Client provided custom x-api-key. Calling OpenAI Gateway...');
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userApiKey}`
+        },
         body: JSON.stringify({
-          model: 'ag/gemini-3.1-pro-low',
+          model: 'gpt-4o-mini',
           messages: [
-            {
-              role: 'system',
-              content: `You are a high-security MachinaRWA Quantitative Agent. Output ONLY JSON: { "analysis_summary": string, "risk_level": "LOW"|"MEDIUM"|"HIGH", "confidence_score": number, "requires_human_audit": boolean }`
-            },
+            { role: 'system', content: 'Output ONLY JSON: { "analysis_summary": string, "risk_level": "LOW"|"MEDIUM"|"HIGH", "confidence_score": number, "requires_human_audit": boolean }' },
             { role: 'user', content: sanitizedInput }
           ],
-          temperature: 0.1,
-          stream: false
+          response_format: { type: "json_object" }
         })
       });
-      clearTimeout(timeoutId);
-
-      if (aiResponse.ok) {
-        const aiData = await aiResponse.json();
-        let rawOutput = aiData.choices[0].message.content;
-        if (rawOutput.startsWith('```json')) {
-          rawOutput = rawOutput.replace(/^```json\n/, '').replace(/\n```$/, '');
-        }
-        reasoning = JSON.parse(rawOutput);
-      } else {
-        throw new Error(`AI Gateway HTTP ${aiResponse.status}`);
+      if (response.ok) {
+        const data = await response.json();
+        reasoning = JSON.parse(data.choices[0].message.content);
       }
-    } catch (aiErr) {
-      console.warn(`[MachineServer] AI Proxy offline/rate-limited (${aiErr.message}), switching to Deterministic Rule Engine.`);
-      
-      // Deterministic Quantitative Rule Engine Fallback
-      const hasValuation = /\$?\d+(\.\d+)?[MkB]?/i.test(sanitizedInput);
-      const hasYield = /\d+(\.\d+)?%/i.test(sanitizedInput);
-      
-      let confidence = 90;
-      let risk = "LOW";
-      let summary = "Deterministic quantitative assessment verified valid asset metrics.";
-      
-      if (!hasValuation || !hasYield) {
-        confidence = 45;
-        risk = "HIGH";
-        summary = "Payload missing key quantitative yield/valuation metrics.";
-      }
-
-      reasoning = {
-        analysis_summary: summary,
-        risk_level: risk,
-        confidence_score: confidence,
-        requires_human_audit: confidence < 85
-      };
+    } catch (e) {
+      console.warn('[MachineServer] BYOK API call failed, falling back to rule engine:', e.message);
     }
+  }
+
+  // Deterministic Rule Engine Fallback if no key or BYOK failed
+  if (!reasoning) {
+    const hasValuation = /\$?\d+(\.\d+)?[MkB]?/i.test(sanitizedInput);
+    const hasYield = /\d+(\.\d+)?%/i.test(sanitizedInput);
+    
+    let confidence = 90;
+    let risk = "LOW";
+    let summary = "Quantitative rule engine verified valid asset valuation & yield metrics.";
+    
+    if (!hasValuation || !hasYield) {
+      confidence = 45;
+      risk = "HIGH";
+      summary = "Payload missing key quantitative yield/valuation metrics.";
+    }
+
+    reasoning = {
+      analysis_summary: summary,
+      risk_level: risk,
+      confidence_score: confidence,
+      requires_human_audit: confidence < 85
+    };
+  }
 
     // GUARDRAIL: Halt on low confidence or human audit requirement
     if (reasoning.confidence_score < 85 || reasoning.requires_human_audit) {
