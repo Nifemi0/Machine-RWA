@@ -20,6 +20,14 @@
       "dest": "/api/compute.js"
     },
     {
+      "src": "/compute",
+      "dest": "/public/compute.html"
+    },
+    {
+      "src": "/operator",
+      "dest": "/public/operator.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/public/$1"
     }

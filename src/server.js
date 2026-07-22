@@ -35,19 +35,38 @@ const agentKeys = getOrCreateAgentKeys();
 // BUG FIX 3: agentKeys.publicKey doesn't exist — it's agentKeys.pub in casper-js-sdk v5.x
 const agentPublicKeyHex = agentKeys.pub.toHex();
 
-// In-memory seen proofs set — BUG FIX 4: replay attack prevention
+// In-memory + persistent seen proofs set
+const METRICS_FILE = path.join(process.env.HOME || '/root', '.shipguard', 'machina-server-metrics.json');
+const PROOFS_FILE = path.join(process.env.HOME || '/root', '.shipguard', 'machina-redeemed-proofs.json');
+
 const seenProofs = new Set();
-// Prune seen proofs every 10 minutes to avoid unbounded memory growth
-setInterval(() => seenProofs.clear(), 10 * 60 * 1000);
+try {
+  if (fs.existsSync(PROOFS_FILE)) {
+    const list = JSON.parse(fs.readFileSync(PROOFS_FILE, 'utf8'));
+    list.forEach(p => seenProofs.add(p));
+  }
+} catch (_) {}
+
+function saveRedeemedProofs() {
+  try {
+    const dir = path.dirname(PROOFS_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(PROOFS_FILE, JSON.stringify(Array.from(seenProofs).slice(-1000)), 'utf8');
+  } catch (e) {
+    console.error('[MachineServer] Failed to save redeemed proofs:', e.message);
+  }
+}
 
 // Metrics store
-const METRICS_FILE = path.join(process.env.HOME || '/root', '.shipguard', 'machina-server-metrics.json');
-
 let metrics = {
   uptimeSeconds: 0,
   completedJobs: 0,
   accumulatedRevenueMotes: 0n,
-  currentCpuTemp: 42.5
+  currentCpuTemp: 42.5,
+  shareholders: [
+    { address: '01c238bdf5a5dbfb2b7692cd01828f26687a49c2182fb5b8403b262709e0d324b9', share: 60 },
+    { address: '015fe42d789a12887d77ebaed26687a49c2182fb5b8403b262709e0d324b999990', share: 40 }
+  ]
 };
 
 // Load existing metrics so revenue is never lost on restart
@@ -57,6 +76,7 @@ try {
     metrics.completedJobs = data.completedJobs || 0;
     metrics.accumulatedRevenueMotes = BigInt(data.accumulatedRevenueMotes || 0);
     metrics.uptimeSeconds = data.uptimeSeconds || 0;
+    if (data.shareholders) metrics.shareholders = data.shareholders;
   }
 } catch (e) {
   console.error('[MachineServer] Could not load persisted metrics, starting fresh.', e.message);
@@ -64,11 +84,14 @@ try {
 
 function saveMetrics() {
   try {
+    const dir = path.dirname(METRICS_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(METRICS_FILE, JSON.stringify({
       uptimeSeconds: metrics.uptimeSeconds,
       completedJobs: metrics.completedJobs,
       accumulatedRevenueMotes: metrics.accumulatedRevenueMotes.toString(),
-      currentCpuTemp: metrics.currentCpuTemp
+      currentCpuTemp: metrics.currentCpuTemp,
+      shareholders: metrics.shareholders
     }), 'utf8');
   } catch (e) {
     console.error('[MachineServer] Failed to save metrics:', e.message);
@@ -80,8 +103,6 @@ const os = require('os');
 setInterval(() => { metrics.uptimeSeconds++; }, 1000);
 setInterval(() => {
   const loadAvg = os.loadavg()[0];
-  const totalMem = os.totalmem();
-  const freeMem = os.freemem();
   metrics.cpuLoadPercent = parseFloat(((loadAvg / os.cpus().length) * 100).toFixed(1));
   metrics.currentCpuTemp = parseFloat((38 + (metrics.cpuLoadPercent * 0.2)).toFixed(1));
 }, 3000);
@@ -100,9 +121,24 @@ app.get('/status', (req, res) => {
       completed_jobs: metrics.completedJobs,
       accumulated_revenue_cspr: Number(metrics.accumulatedRevenueMotes / 1000000n) / 1000,
       cpu_temperature: metrics.currentCpuTemp,
-      cpu_load_percent: metrics.cpuLoadPercent || 15.0
+      cpu_load_percent: metrics.cpuLoadPercent || 15.0,
+      redeemed_proofs_count: seenProofs.size,
+      shareholders: metrics.shareholders
     }
   });
+});
+
+/**
+ * Update Shareholder Config
+ */
+app.post('/api/config/shareholders', (req, res) => {
+  const { shareholders } = req.body || {};
+  if (Array.isArray(shareholders) && shareholders.length > 0) {
+    metrics.shareholders = shareholders;
+    saveMetrics();
+    return res.json({ success: true, shareholders: metrics.shareholders });
+  }
+  return res.status(400).json({ error: 'Invalid Shareholders Array' });
 });
 
 /**
