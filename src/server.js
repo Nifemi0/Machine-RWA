@@ -214,11 +214,22 @@ app.post('/api/compute', async (req, res) => {
 
   if (seenProofs.has(paymentProof)) {
     return res.status(409).json({
-      error: 'Duplicate Payment Proof',
-      message: 'This payment proof has already been redeemed.'
+      error: 'Duplicate Payment Proof (Replay Attack Prevented)',
+      message: 'This payment proof deploy hash has already been redeemed.'
     });
   }
+  
+  // Verify deploy status on Casper Testnet RPC node
+  const rpcCheck = await verifyCasperDeployOnChain(paymentProof, amountMotes, agentPublicKeyHex);
+  if (!rpcCheck.verified) {
+    return res.status(402).json({
+      error: 'On-Chain Payment Verification Failed',
+      message: rpcCheck.reason
+    });
+  }
+
   seenProofs.add(paymentProof);
+  saveRedeemedProofs();
 
   const { jobInput } = req.body || {};
   if (!jobInput || typeof jobInput !== 'string' || jobInput.trim().length === 0) {

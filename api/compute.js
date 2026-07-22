@@ -7,7 +7,7 @@ const express = require('express');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-const { getOrCreateAgentKeys } = require('../src/casper-client');
+const { getOrCreateAgentKeys } = require('./casper-client');
 
 const app = express();
 
@@ -35,10 +35,9 @@ const agentKeys = getOrCreateAgentKeys();
 // BUG FIX 3: agentKeys.publicKey doesn't exist — it's agentKeys.pub in casper-js-sdk v5.x
 const agentPublicKeyHex = agentKeys.pub.toHex();
 
-// In-memory + persistent seen proofs set (use /tmp on Vercel)
-const DATA_DIR = process.env.VERCEL ? '/tmp' : path.join(process.env.HOME || '/root', '.shipguard');
-const METRICS_FILE = path.join(DATA_DIR, 'machina-server-metrics.json');
-const PROOFS_FILE = path.join(DATA_DIR, 'machina-redeemed-proofs.json');
+// In-memory + persistent seen proofs set
+const METRICS_FILE = path.join(process.env.HOME || '/root', '.shipguard', 'machina-server-metrics.json');
+const PROOFS_FILE = path.join(process.env.HOME || '/root', '.shipguard', 'machina-redeemed-proofs.json');
 
 const seenProofs = new Set();
 try {
@@ -215,11 +214,22 @@ app.post('/api/compute', async (req, res) => {
 
   if (seenProofs.has(paymentProof)) {
     return res.status(409).json({
-      error: 'Duplicate Payment Proof',
-      message: 'This payment proof has already been redeemed.'
+      error: 'Duplicate Payment Proof (Replay Attack Prevented)',
+      message: 'This payment proof deploy hash has already been redeemed.'
     });
   }
+  
+  // Verify deploy status on Casper Testnet RPC node
+  const rpcCheck = await verifyCasperDeployOnChain(paymentProof, amountMotes, agentPublicKeyHex);
+  if (!rpcCheck.verified) {
+    return res.status(402).json({
+      error: 'On-Chain Payment Verification Failed',
+      message: rpcCheck.reason
+    });
+  }
+
   seenProofs.add(paymentProof);
+  saveRedeemedProofs();
 
   const { jobInput } = req.body || {};
   if (!jobInput || typeof jobInput !== 'string' || jobInput.trim().length === 0) {
@@ -311,18 +321,15 @@ app.post('/api/compute', async (req, res) => {
     });
 });
 
-// Catch-all error handler for unhandled throws inside routes
+// BUG FIX 11: Catch-all error handler for unhandled throws inside routes
 app.use((err, req, res, next) => {
   console.error('[MachineServer] Unhandled error:', err.message);
   res.status(500).json({ error: 'Internal Server Error', message: err.message });
 });
 
-if (process.env.VERCEL) {
-  module.exports = app;
-} else {
-  app.listen(PORT, () => {
-    console.log(`[MachineServer] MachinaRWA API running on port ${PORT}`);
-    console.log(`[MachineServer] Agent Public Key: ${agentPublicKeyHex}`);
-  });
-  module.exports = { app, metrics };
-}
+app.listen(PORT, () => {
+  console.log(`[MachineServer] MachinaRWA API running on port ${PORT}`);
+  console.log(`[MachineServer] Agent Public Key: ${agentPublicKeyHex}`);
+});
+
+module.exports = { app, metrics };
