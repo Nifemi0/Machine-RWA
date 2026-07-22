@@ -311,15 +311,18 @@ app.post('/api/compute', async (req, res) => {
     });
 });
 
-// BUG FIX 11: Catch-all error handler for unhandled throws inside routes
+// Catch-all error handler for unhandled throws inside routes
 app.use((err, req, res, next) => {
   console.error('[MachineServer] Unhandled error:', err.message);
   res.status(500).json({ error: 'Internal Server Error', message: err.message });
 });
 
-app.listen(PORT, () => {
-  console.log(`[MachineServer] MachinaRWA API running on port ${PORT}`);
-  console.log(`[MachineServer] Agent Public Key: ${agentPublicKeyHex}`);
-});
-
-module.exports = { app, metrics };
+if (process.env.VERCEL) {
+  module.exports = app;
+} else {
+  app.listen(PORT, () => {
+    console.log(`[MachineServer] MachinaRWA API running on port ${PORT}`);
+    console.log(`[MachineServer] Agent Public Key: ${agentPublicKeyHex}`);
+  });
+  module.exports = { app, metrics };
+}
