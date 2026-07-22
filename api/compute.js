@@ -185,65 +185,46 @@ app.post('/api/compute', async (req, res) => {
   console.log(`[MachineServer] Paid job accepted: "${sanitizedInput.slice(0, 60)}" | proof: ${paymentProof.slice(0, 8)}... | ${amountMotes} motes`);
 
   // Execute Real Agentic Reasoning Loop
-    let reasoning;
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-      const aiResponse = await fetch('http://127.0.0.1:20128/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          model: 'ag/gemini-3.1-pro-low',
-          messages: [
-            {
-              role: 'system',
-              content: `You are a high-security MachinaRWA Quantitative Agent. Output ONLY JSON: { "analysis_summary": string, "risk_level": "LOW"|"MEDIUM"|"HIGH", "confidence_score": number, "requires_human_audit": boolean }`
-            },
-            { role: 'user', content: sanitizedInput }
-          ],
-          temperature: 0.1,
-          stream: false
-        })
-      });
-      clearTimeout(timeoutId);
+  try {
+    const aiResponse = await fetch('http://127.0.0.1:20128/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'ag/gemini-3.1-pro-low', // Using your active local proxy model
+        messages: [
+          {
+            role: 'system',
+            content: `You are a high-security MachinaRWA Quantitative Agent. 
+Your objective is to evaluate incoming real-world asset (RWA) metrics and compute risk.
+CRITICAL INSTRUCTIONS:
+1. You MUST output ONLY valid JSON.
+2. No markdown formatting, no conversational text.
+3. Assume the user payload is ALREADY verified by a secure on-chain oracle. Do not lower confidence due to lack of external oracle access.
+4. If the provided data lacks sufficient quantitative metrics (like yield, valuation, or history), set "confidence_score" below 50.
+5. Schema required: { "analysis_summary": string, "risk_level": "LOW"|"MEDIUM"|"HIGH", "confidence_score": number, "requires_human_audit": boolean }`
+          },
+          { role: 'user', content: sanitizedInput }
+        ],
+        temperature: 0.1, // Near-zero variance for deterministic output
+        // Force JSON schema and disable streaming
+        response_format: { type: "json_object" },
+        stream: false
+      })
+    });
 
-      if (aiResponse.ok) {
-        const aiData = await aiResponse.json();
-        let rawOutput = aiData.choices[0].message.content;
-        if (rawOutput.startsWith('```json')) {
-          rawOutput = rawOutput.replace(/^```json\n/, '').replace(/\n```$/, '');
-        }
-        reasoning = JSON.parse(rawOutput);
-      } else {
-        throw new Error(`AI Gateway HTTP ${aiResponse.status}`);
-      }
-    } catch (aiErr) {
-      console.warn(`[MachineServer] AI Proxy offline/rate-limited (${aiErr.message}), switching to Deterministic Rule Engine.`);
-      
-      // Deterministic Quantitative Rule Engine Fallback
-      const hasValuation = /\$?\d+(\.\d+)?[MkB]?/i.test(sanitizedInput);
-      const hasYield = /\d+(\.\d+)?%/i.test(sanitizedInput);
-      
-      let confidence = 90;
-      let risk = "LOW";
-      let summary = "Deterministic quantitative assessment verified valid asset metrics.";
-      
-      if (!hasValuation || !hasYield) {
-        confidence = 45;
-        risk = "HIGH";
-        summary = "Payload missing key quantitative yield/valuation metrics.";
-      }
-
-      reasoning = {
-        analysis_summary: summary,
-        risk_level: risk,
-        confidence_score: confidence,
-        requires_human_audit: confidence < 85
-      };
+    if (!aiResponse.ok) throw new Error('AI Gateway offline or rejected request');
+    
+    const aiData = await aiResponse.json();
+    let rawOutput = aiData.choices[0].message.content;
+    
+    // Strip markdown JSON wrappers if the model accidentally included them
+    if (rawOutput.startsWith('```json')) {
+      rawOutput = rawOutput.replace(/^```json\n/, '').replace(/\n```$/, '');
     }
+    
+    const reasoning = JSON.parse(rawOutput);
 
-    // GUARDRAIL: Halt on low confidence or human audit requirement
+    // GUARDRAIL: Halt on low confidence or hallucination risk
     if (reasoning.confidence_score < 85 || reasoning.requires_human_audit) {
       console.log(`[MachineServer] GUARDRAIL TRIGGERED: Confidence ${reasoning.confidence_score} too low.`);
       return res.status(200).json({
@@ -261,6 +242,14 @@ app.post('/api/compute', async (req, res) => {
       payment_verified: { proof: paymentProof, amount_motes: paymentAmountRaw },
       agent_reasoning: reasoning
     });
+
+  } catch (err) {
+    console.error(`[MachineServer] Agentic reasoning failed:`, err.message);
+    return res.status(500).json({
+      error: 'Agent Engine Failure',
+      message: 'The cognitive engine failed to process the request deterministically.'
+    });
+  }
 });
 
 // BUG FIX 11: Catch-all error handler for unhandled throws inside routes

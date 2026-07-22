@@ -3,7 +3,6 @@ module.exports = {
     {
       name: "machina-server",
       script: "./src/server.js",
-      cwd: "/root/machina-rwa",
       watch: false,
       env: {
         NODE_ENV: "production",
@@ -13,7 +12,6 @@ module.exports = {
     {
       name: "machina-agent",
       script: "./src/agent.js",
-      cwd: "/root/machina-rwa",
       watch: false,
       env: {
         NODE_ENV: "production"
