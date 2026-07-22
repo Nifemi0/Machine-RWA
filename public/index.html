@@ -3,307 +3,353 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Machine RWA — Hardware Franchise Portal</title>
+  <title>Machine RWA — Tokenized Physical Hardware on Casper</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0d0e12;
-      --panel: #14161d;
-      --border: #272a36;
-      --border-focus: #3b82f6;
-      --text: #f1f5f9;
-      --text-muted: #808ea3;
-      --green: #00ff66;
-      --red: #ff3344;
-      --amber: #ffaa00;
-      --blue: #2563eb;
-      --radius: 6px;
+      --bg: #090a0f;
+      --panel: #11131a;
+      --panel-hover: #161922;
+      --border: #222634;
+      --border-light: #2e3447;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+      --accent: #3b82f6;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --radius: 12px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       background: var(--bg);
       color: var(--text);
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: 14px;
+      line-height: 1.6;
       min-height: 100vh;
+      overflow-x: hidden;
     }
-
-    /* Flat Hairline Panel Grid */
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-    }
-
-    .btn {
-      background: #1e2330;
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 8px 14px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.1s, border-color 0.1s;
-    }
-    .btn:hover { background: #282e3f; border-color: #3f475a; }
-    .btn-primary { background: var(--blue); border-color: var(--blue); color: #fff; }
-    .btn-primary:hover { background: #1d4ed8; }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .input {
-      width: 100%;
-      background: #090a0d;
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 8px 12px;
-      font-size: 12px;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .input:focus { outline: none; border-color: var(--border-focus); }
 
     .mono { font-family: 'JetBrains Mono', monospace; }
 
-    /* Modal Backdrop */
+    .nav-header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(9, 10, 15, 0.85);
+      backdrop-filter: blur(16px);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .btn {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover { background: var(--panel-hover); border-color: var(--border-light); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+    .btn-primary:hover { background: #2563eb; border-color: #2563eb; }
+
+    .input {
+      width: 100%;
+      background: #0d0f14;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      transition: border-color 0.15s;
+    }
+    .input:focus { outline: none; border-color: var(--accent); }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: var(--accent-green);
+    }
+
+    /* Modal Styling */
     .modal-backdrop {
       position: fixed; inset: 0;
       background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
       display: flex; align-items: center; justify-content: center;
       z-index: 100; opacity: 0; pointer-events: none;
-      transition: opacity 0.15s ease;
+      transition: opacity 0.2s ease;
     }
     .modal-backdrop.active { opacity: 1; pointer-events: auto; }
 
     .terminal {
-      background: #060709;
+      background: #050608;
+      border: 1px solid var(--border);
+      border-radius: 8px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      line-height: 16px;
-      height: 220px;
+      font-size: 12px;
+      line-height: 1.6;
+      height: 240px;
       overflow-y: auto;
-      padding: 12px;
-      border-top: 1px solid var(--border);
+      padding: 14px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
-  <nav style="border-bottom:1px solid var(--border);background:var(--panel);padding:0 20px;height:48px;display:flex;align-items:center;justify-content:space-between;">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <span style="font-weight:700;font-size:14px;letter-spacing:-0.2px;">Machine RWA</span>
-      <span style="font-size:11px;color:var(--text-muted);border-left:1px solid var(--border);padding-left:12px;" class="mono">NODE_ID: 016cd14...028f2</span>
-    </div>
-    
-    <div style="display:flex;align-items:center;gap:10px;">
-      <!-- Wallet Connection Button -->
-      <button id="wallet-btn" onclick="openWalletModal()" class="btn">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a1 1 0 11-2 0 1 1 0 012 0z"/></svg>
-        <span id="wallet-btn-text">Connect Wallet</span>
-      </button>
-
-      <button onclick="openListingModal()" class="btn">
-        Configure Node
-      </button>
-
-      <div style="display:flex;align-items:center;gap:6px;padding:4px 8px;background:#090a0d;border:1px solid var(--border);border-radius:4px;">
-        <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;"></span>
-        <span style="font-size:11px;color:var(--text-muted);" class="mono">Casper Testnet</span>
+  <!-- Top Navigation -->
+  <nav class="nav-header">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;">M</div>
+      <div>
+        <span style="font-weight:700;font-size:15px;letter-spacing:-0.3px;">Machine RWA</span>
+        <span style="font-size:11px;color:var(--text-dim);margin-left:8px;" class="mono">Casper Agentic DePIN</span>
       </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="pill mono">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent-green);"></span>
+        Casper Testnet
+      </div>
+
+      <button id="wallet-connect-btn" onclick="openWalletModal()" class="btn btn-primary">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a1 1 0 11-2 0 1 1 0 012 0z"/></svg>
+        <span id="wallet-btn-label">Connect Casper Wallet</span>
+      </button>
     </div>
   </nav>
 
-  <!-- Main Grid Layout -->
-  <div style="max-width:1150px;margin:0 auto;padding:20px;display:grid;grid-template-columns:300px 1fr;gap:16px;">
+  <!-- Hero Section & Product Thesis -->
+  <section style="max-width:1100px;margin:0 auto;padding:48px 24px 32px;">
+    <div style="max-width:760px;">
+      <h1 style="font-size:36px;font-weight:800;letter-spacing:-1px;line-height:1.2;margin-bottom:12px;">
+        Turn Physical Hardware into Revenue-Generating RWAs on Casper Network.
+      </h1>
+      <p style="font-size:16px;color:var(--text-dim);margin-bottom:24px;">
+        Machine RWA tokenizes physical machines (CPU inference nodes, IoT telemetry, compute pools) into autonomous franchises. AI agents execute work via accountless <strong style="color:var(--text);">x402 Micropayments</strong>, while yield disburses directly to on-chain shareholders.
+      </p>
 
-    <!-- Sidebar Telemetry -->
-    <div style="display:flex;flex-direction:column;gap:16px;">
-      
-      <div class="panel" style="padding:16px;">
-        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;">Accumulated Revenue</div>
-        <div style="display:flex;align-items:baseline;gap:6px;">
-          <span style="font-size:24px;font-weight:700;color:var(--green);" class="mono" id="metric-revenue">0.000</span>
-          <span style="font-size:12px;color:var(--text-muted);" class="mono">CSPR</span>
+      <div style="display:flex;gap:12px;">
+        <a href="#demo-section" class="btn btn-primary" style="padding:11px 20px;">
+          Try x402 Compute Portal
+        </a>
+        <button onclick="openListingModal()" class="btn" style="padding:11px 20px;">
+          Register Hardware Node
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Grid Dashboard -->
+  <main id="demo-section" style="max-width:1100px;margin:0 auto;padding:0 24px 64px;display:grid;grid-template-columns:320px 1fr;gap:24px;">
+
+    <!-- Left Stats & Telemetry Panel -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+
+      <!-- Revenue Card -->
+      <div class="card">
+        <span style="font-size:12px;font-weight:600;color:var(--text-dim);text-transform:uppercase;" class="mono">Accumulated x402 Revenue</span>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;">
+          <span style="font-size:32px;font-weight:800;color:var(--accent-green);" class="mono" id="metric-revenue">0.000</span>
+          <span style="font-size:14px;color:var(--text-dim);" class="mono">CSPR</span>
         </div>
-        <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:11px;">
-          <span style="color:var(--text-muted);">Payout Threshold</span>
-          <span style="color:var(--text);" class="mono">5.0 CSPR</span>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;">
+          <span style="color:var(--text-dim);">Autopay Threshold</span>
+          <span style="font-weight:600;" class="mono">5.0 CSPR</span>
         </div>
       </div>
 
-      <div class="panel" style="overflow:hidden;">
-        <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;">
-          Node Status & Load
+      <!-- Telemetry Stats -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--text-dim);text-transform:uppercase;">
+          Active Hardware Node Telemetry
         </div>
-        <div style="padding:0 14px;">
-          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
-            <span style="color:var(--text-muted);">Completed Inferences</span>
-            <span class="mono" id="metric-jobs">0</span>
+        <div style="padding:4px 20px;">
+          <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+            <span style="color:var(--text-dim);">Completed Jobs</span>
+            <span style="font-weight:600;" class="mono" id="metric-jobs">0</span>
           </div>
-          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
-            <span style="color:var(--text-muted);">Thermal Temperature</span>
-            <span class="mono"><span id="metric-temp">--</span>°C</span>
+          <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+            <span style="color:var(--text-dim);">System Thermal / Load</span>
+            <span style="font-weight:600;" class="mono"><span id="metric-temp">--</span>°C</span>
           </div>
-          <div style="display:flex;justify-content:space-between;padding:10px 0;">
-            <span style="color:var(--text-muted);">Process Uptime</span>
-            <span class="mono" id="metric-uptime">0s</span>
+          <div style="display:flex;justify-content:space-between;padding:12px 0;">
+            <span style="color:var(--text-dim);">Node Uptime</span>
+            <span style="font-weight:600;" class="mono" id="metric-uptime">0s</span>
           </div>
         </div>
       </div>
 
-      <div class="panel" style="padding:14px;">
-        <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;">Machine Agent Key</div>
-        <div style="background:#090a0d;border:1px solid var(--border);border-radius:4px;padding:8px;word-break:break-all;">
-          <code id="agent-key" class="mono" style="font-size:10px;color:var(--text-muted);">Loading...</code>
+      <!-- Identity -->
+      <div class="card">
+        <span style="font-size:12px;font-weight:600;color:var(--text-dim);text-transform:uppercase;" class="mono">Node Public Key</span>
+        <div style="margin-top:8px;background:#050608;border:1px solid var(--border);border-radius:6px;padding:10px;word-break:break-all;">
+          <code id="agent-key" class="mono" style="font-size:11px;color:var(--accent);">Loading...</code>
         </div>
       </div>
 
     </div>
 
-    <!-- Main Content Area -->
-    <div style="display:flex;flex-direction:column;gap:16px;">
-      
-      <div class="panel" style="overflow:hidden;">
-        <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-weight:600;font-size:13px;">x402 Micropayment Execution Portal</span>
-          <span style="font-size:11px;color:var(--text-muted);" class="mono">POST /api/compute</span>
+    <!-- Right Interaction & Execution Console -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h2 style="font-size:16px;font-weight:700;">x402 Paid Compute Portal</h2>
+          <span style="font-size:11px;padding:4px 8px;background:#050608;border:1px solid var(--border);border-radius:6px;" class="mono">POST /api/compute</span>
         </div>
 
-        <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;flex-direction:column;gap:14px;">
           
           <div>
-            <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">x-payment-proof (Casper Deploy Hash)</label>
-            <div style="display:flex;gap:6px;">
-              <input type="text" id="sim-proof" class="input" readonly>
-              <button onclick="generateMockProof()" class="btn" style="white-space:nowrap;">Regenerate</button>
+            <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;font-weight:500;">x-payment-proof (Casper Deploy Hash)</label>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="sim-proof" class="input" readonly style="color:var(--accent);">
+              <button onclick="generateMockProof()" class="btn" style="white-space:nowrap;">Regenerate Proof</button>
             </div>
           </div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <div>
-              <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">x-payment-amount (motes)</label>
+              <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;font-weight:500;">x-payment-amount (motes)</label>
               <input type="number" id="sim-amount" value="1000000000" class="input">
             </div>
             <div>
-              <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">x-api-key (Optional BYOK Key)</label>
+              <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;font-weight:500;">x-api-key (Optional BYOK)</label>
               <input type="password" id="sim-key" placeholder="sk-..." class="input">
             </div>
           </div>
 
           <div>
-            <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Quantitative RWA Payload</label>
-            <textarea id="sim-payload" class="input" rows="4" style="resize:none;font-family:'Inter';">Asset ID: RE-LAG-092. Type: Commercial Real Estate. Location: Victoria Island, Lagos. Current Valuation: $1.2M USD. Verified Annual Rental Yield: 8.4%. Requesting quantitative risk level classification.</textarea>
+            <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;font-weight:500;">Quantitative RWA Payload</label>
+            <textarea id="sim-payload" class="input" rows="4" style="resize:none;font-family:'Plus Jakarta Sans';">Asset ID: RE-LAG-092. Type: Commercial Real Estate. Location: Victoria Island, Lagos. Current Valuation: $1.2M USD. Verified Annual Rental Yield: 8.4%. Requesting quantitative risk classification.</textarea>
           </div>
 
-          <div style="display:flex;gap:10px;padding-top:4px;">
-            <button id="btn-submit" onclick="submitJob()" class="btn btn-primary" style="flex:1;">
-              Execute x402 Compute Job
+          <div style="display:flex;gap:12px;padding-top:4px;">
+            <button id="btn-submit" onclick="submitJob()" class="btn btn-primary" style="flex:1;padding:11px;">
+              Execute x402 Paid Compute
             </button>
-            <button onclick="clearLog()" class="btn">Clear Console</button>
+            <button onclick="clearLog()" class="btn">Clear Output</button>
+          </div>
+
+          <div class="terminal" id="terminal" style="margin-top:8px;">
+            <span style="color:var(--text-dim);">Console ready. Submit an x402 payload to verify execution output.</span>
           </div>
 
         </div>
-
-        <div class="terminal" id="terminal">
-          <span style="color:var(--text-muted);">Console initialized. Ready for x402 inference requests.</span>
-        </div>
-
       </div>
 
     </div>
-  </div>
+  </main>
 
-  <!-- Wallet Connection Modal (CSPR.click / Casper Wallet) -->
+  <!-- Wallet Connection Modal -->
   <div id="wallet-modal" class="modal-backdrop">
-    <div class="panel" style="width:380px;padding:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <span style="font-weight:600;font-size:14px;">Connect Casper Wallet</span>
-        <button onclick="closeWalletModal()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;">✕</button>
+    <div class="card" style="width:400px;padding:28px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <h3 style="font-size:16px;font-weight:700;">Connect Casper Wallet</h3>
+        <button onclick="closeWalletModal()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;">✕</button>
       </div>
 
-      <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Select your Casper wallet provider to sign x402 micropayment deploy proofs.</p>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px;">
+        Connect your wallet to sign x402 micropayment proofs and verify Testnet CSPR transfers.
+      </p>
 
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <button onclick="connectWalletProvider('CSPR.click')" class="btn" style="justify-content:space-between;padding:10px 14px;">
-          <span>CSPR.click Agent Skill</span>
-          <span style="font-size:10px;color:var(--green);" class="mono">RECOMMENDED</span>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button onclick="connectWalletProvider('CSPR.click AI Skill')" class="btn" style="justify-content:space-between;padding:12px 16px;">
+          <span>CSPR.click AI Agent Skill</span>
+          <span class="mono" style="font-size:10px;color:var(--accent-green);">BUILDATHON NATIVE</span>
         </button>
 
-        <button onclick="connectWalletProvider('Casper Wallet Extension')" class="btn" style="justify-content:space-between;padding:10px 14px;">
-          <span>Casper Wallet Extension</span>
-          <span style="font-size:10px;color:var(--text-muted);" class="mono">BROWSER</span>
+        <button onclick="connectWalletProvider('Casper Wallet Extension')" class="btn" style="justify-content:space-between;padding:12px 16px;">
+          <span>Casper Wallet Browser Extension</span>
+          <span class="mono" style="font-size:10px;color:var(--text-dim);">BROWSER</span>
         </button>
 
-        <button onclick="connectWalletProvider('CasperDash')" class="btn" style="justify-content:space-between;padding:10px 14px;">
-          <span>CasperDash</span>
-          <span style="font-size:10px;color:var(--text-muted);" class="mono">MOBILE</span>
+        <button onclick="connectWalletProvider('CasperDash Wallet')" class="btn" style="justify-content:space-between;padding:12px 16px;">
+          <span>CasperDash Mobile</span>
+          <span class="mono" style="font-size:10px;color:var(--text-dim);">MOBILE</span>
         </button>
-      </div>
-
-      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);text-align:right;">
-        <button onclick="closeWalletModal()" class="btn">Cancel</button>
       </div>
     </div>
   </div>
 
-  <!-- Node Config Modal -->
+  <!-- Hardware Config Modal -->
   <div id="listing-modal" class="modal-backdrop">
-    <div class="panel" style="width:420px;padding:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <span style="font-weight:600;font-size:14px;">Configure Hardware Node</span>
-        <button onclick="closeListingModal()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;">✕</button>
+    <div class="card" style="width:440px;padding:28px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <h3 style="font-size:16px;font-weight:700;">Register / Configure Hardware Node</h3>
+        <button onclick="closeListingModal()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;">✕</button>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
         <div>
-          <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Node Label</label>
-          <input type="text" id="modal-node-title" value="Machina-Node-Alpha (NVIDIA RTX 4090)" class="input">
+          <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;">Node Hardware Title</label>
+          <input type="text" id="modal-node-title" value="Machine-Node-Alpha (CPU Quantitative Inference)" class="input">
         </div>
 
         <div>
-          <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Minimum Fee (motes)</label>
+          <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;">Minimum Fee per Request (motes)</label>
           <input type="number" id="modal-min-fee" value="1000000000" class="input">
         </div>
 
         <div style="display:flex;gap:10px;margin-top:8px;">
-          <button onclick="saveListingConfig()" class="btn btn-primary" style="flex:1;">Save Settings</button>
+          <button onclick="saveListingConfig()" class="btn btn-primary" style="flex:1;">Save Configuration</button>
           <button onclick="closeListingModal()" class="btn">Cancel</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Javascript Logic -->
   <script>
     const term = document.getElementById('terminal');
-    let connectedWallet = null;
 
     function log(msg, type = '') {
       const el = document.createElement('div');
       const ts = new Date().toISOString().split('T')[1].split('.')[0];
-      let colorClass = '';
-      if (type === 'success') colorClass = 'color:var(--green);';
-      if (type === 'error') colorClass = 'color:var(--red);';
-      if (type === 'halt') colorClass = 'color:var(--amber);';
-      if (type === 'muted') colorClass = 'color:var(--text-muted);';
+      let color = 'var(--text)';
+      if (type === 'success') color = 'var(--accent-green)';
+      if (type === 'error') color = 'var(--accent-red)';
+      if (type === 'halt') color = '#f59e0b';
 
       el.innerHTML = type === 'json'
         ? `<pre style="color:#cbd5e1;padding-left:10px;border-left:2px solid var(--border);margin:4px 0;">${msg}</pre>`
-        : `<span style="color:var(--text-muted);margin-right:8px;">${ts}</span><span style="${colorClass}">${msg}</span>`;
+        : `<span style="color:var(--text-dim);margin-right:8px;">${ts}</span><span style="color:${color};">${msg}</span>`;
       term.appendChild(el);
       term.scrollTop = term.scrollHeight;
     }
 
     function clearLog() {
-      term.innerHTML = '<span style="color:var(--text-muted);">Console cleared.</span>';
+      term.innerHTML = '<span style="color:var(--text-dim);">Console cleared.</span>';
     }
 
     function generateMockProof() {
@@ -326,7 +372,7 @@
     async function submitJob() {
       const btn = document.getElementById('btn-submit');
       btn.disabled = true;
-      btn.textContent = 'Processing...';
+      btn.textContent = 'Processing x402 Micropayment...';
 
       const proof  = document.getElementById('sim-proof').value;
       const amount = document.getElementById('sim-amount').value;
@@ -366,26 +412,23 @@
         log(`Network error: ${e.message}`, 'error');
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Execute x402 Compute Job';
+        btn.textContent = 'Execute x402 Paid Compute';
       }
     }
 
-    // Modal Controls
     function openWalletModal() { document.getElementById('wallet-modal').classList.add('active'); }
     function closeWalletModal() { document.getElementById('wallet-modal').classList.remove('active'); }
     function openListingModal() { document.getElementById('listing-modal').classList.add('active'); }
     function closeListingModal() { document.getElementById('listing-modal').classList.remove('active'); }
 
     function connectWalletProvider(provider) {
-      connectedWallet = provider;
-      document.getElementById('wallet-btn-text').textContent = provider;
-      log(`Connected to wallet provider: ${provider}`, 'success');
+      document.getElementById('wallet-btn-label').textContent = provider;
+      log(`Connected wallet: ${provider}`, 'success');
       closeWalletModal();
     }
 
     function saveListingConfig() {
-      const title = document.getElementById('modal-node-title').value;
-      log(`Node settings updated: ${title}`, 'success');
+      log('Hardware configuration updated', 'success');
       closeListingModal();
     }
 
