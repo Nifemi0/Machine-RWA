@@ -35,9 +35,10 @@ const agentKeys = getOrCreateAgentKeys();
 // BUG FIX 3: agentKeys.publicKey doesn't exist — it's agentKeys.pub in casper-js-sdk v5.x
 const agentPublicKeyHex = agentKeys.pub.toHex();
 
-// In-memory + persistent seen proofs set
-const METRICS_FILE = path.join(process.env.HOME || '/root', '.shipguard', 'machina-server-metrics.json');
-const PROOFS_FILE = path.join(process.env.HOME || '/root', '.shipguard', 'machina-redeemed-proofs.json');
+// In-memory + persistent seen proofs set (use /tmp on Vercel)
+const DATA_DIR = process.env.VERCEL ? '/tmp' : path.join(process.env.HOME || '/root', '.shipguard');
+const METRICS_FILE = path.join(DATA_DIR, 'machina-server-metrics.json');
+const PROOFS_FILE = path.join(DATA_DIR, 'machina-redeemed-proofs.json');
 
 const seenProofs = new Set();
 try {
