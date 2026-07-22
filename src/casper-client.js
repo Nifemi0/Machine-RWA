@@ -30,12 +30,20 @@ function getOrCreateAgentKeys() {
   const privKey = PrivateKey.generate(sdk.KeyAlgorithm.ED25519);
   const pem = privKey.toPem();
 
-  fs.writeFileSync(keyPath, JSON.stringify({
-    publicKey: privKey.pub.toHex(),
-    pem: pem
-  }, null, 2), 'utf8');
-  
-  console.log(`[CasperClient] Generated new Agent Key: ${privKey.pub.toHex()}`);
+  try {
+    const dir = path.dirname(keyPath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(keyPath, JSON.stringify({
+      publicKey: privKey.pub.toHex(),
+      pem: pem
+    }, null, 2), 'utf8');
+  } catch (_) {
+    // If running in read-only Vercel serverless environment, write to /tmp
+    try {
+      fs.writeFileSync('/tmp/agent-keys.json', JSON.stringify({ publicKey: privKey.pub.toHex(), pem }, null, 2), 'utf8');
+    } catch (e) {}
+  }
+
   return privKey;
 }
 

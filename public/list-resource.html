@@ -318,7 +318,15 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ shareholders })
         });
-        const data = await res.json();
+
+        const contentType = res.headers.get('content-type') || '';
+        let data;
+        if (contentType.includes('application/json')) {
+          data = await res.json();
+        } else {
+          const textText = await res.text();
+          data = { error: 'Server Response Error', message: textText.slice(0, 120) };
+        }
 
         const msg = document.getElementById('status-msg');
         msg.style.display = 'block';
@@ -326,12 +334,14 @@
           msg.textContent = `✅ Successfully saved ${shareholders.length} dynamic shareholder wallet accounts to node! Redirecting to Operator Dashboard...`;
           setTimeout(() => { window.location.href = 'operator.html'; }, 1800);
         } else {
-          msg.textContent = `❌ Error: ${data.error || 'Failed to update shareholders'}`;
+          msg.textContent = `❌ ${data.error || 'Error'}: ${data.message || 'Failed to update shareholders'}`;
           btn.disabled = false;
           btn.textContent = 'Save & Deploy Configuration to Node';
         }
       } catch (err) {
-        alert(`Failed to save config: ${err.message}`);
+        const msg = document.getElementById('status-msg');
+        msg.style.display = 'block';
+        msg.textContent = `❌ Submission Error: ${err.message}`;
         btn.disabled = false;
         btn.textContent = 'Save & Deploy Configuration to Node';
       }

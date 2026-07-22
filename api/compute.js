@@ -7,7 +7,7 @@ const express = require('express');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-const { getOrCreateAgentKeys } = require('./casper-client');
+const { getOrCreateAgentKeys } = require('../src/casper-client');
 
 const app = express();
 
