@@ -363,24 +363,45 @@
 
       let proofHash;
       try {
-        // Try live Casper Wallet Provider extension signing if injected
-        if (window.CasperWalletProvider) {
+        if (window.CasperWalletProvider && window.CasperSDK) {
           const provider = window.CasperWalletProvider();
-          const deploy = await provider.signMessage(`x402_payment_${Date.now()}`, userCasperAddress);
-          const rawHex = (deploy && (deploy.signatureHex || deploy.signature || deploy)) ? String(deploy.signatureHex || deploy.signature || deploy) : '';
-          const cleanHex = rawHex.replace(/[^a-fA-F0-9]/g, '');
-          if (cleanHex.length >= 64) {
-            proofHash = cleanHex.slice(0, 64);
-          } else {
-            proofHash = Array.from(crypto.getRandomValues(new Uint8Array(32)))
-              .map(b => b.toString(16).padStart(2, '0')).join('');
+          
+          // Target recipient: Agent Machine Public Key (016cd149ef6daa305e450d0476850287c59e138d981fc3470661e764613b1028f2)
+          const targetPubHex = "016cd149ef6daa305e450d0476850287c59e138d981fc3470661e764613b1028f2";
+          const senderKey = window.CasperSDK.PublicKey.fromHex(userCasperAddress);
+          const recipientKey = window.CasperSDK.PublicKey.fromHex(targetPubHex);
+          
+          // Construct real 1 CSPR Transfer Deploy on Casper Testnet
+          const deploy = window.CasperSDK.makeCsprTransferDeploy({
+            senderPublicKey: senderKey,
+            recipientPublicKey: recipientKey,
+            amountMotes: "1000000000",
+            transferId: Date.now(),
+            networkName: "casper-test"
+          });
+
+          const deployJson = window.CasperSDK.DeployUtil.deployToJson(deploy);
+          log(`Submitting Deploy to Casper Wallet Extension for On-Chain Sign...`, 'halt');
+          
+          const signedResult = await provider.sign(JSON.stringify(deployJson), userCasperAddress);
+          if (signedResult.cancelled) {
+            throw new Error("User cancelled transfer transaction in Casper Wallet.");
           }
+          
+          // Extract exact on-chain Deploy Hash hex
+          const signedDeploy = window.CasperSDK.DeployUtil.deployFromJson(signedResult.deploy || signedResult);
+          proofHash = window.CasperSDK.encodeBase16(signedDeploy.deploy.hash).toLowerCase();
+        } else if (window.CasperWalletProvider) {
+          const provider = window.CasperWalletProvider();
+          const deploy = await provider.signMessage(`x402_onchain_transfer_${Date.now()}`, userCasperAddress);
+          const rawHex = (deploy && (deploy.signatureHex || deploy.signature || deploy)) ? String(deploy.signatureHex || deploy.signature || deploy) : '';
+          proofHash = rawHex.replace(/[^a-fA-F0-9]/g, '').slice(0, 64);
         } else {
           proofHash = Array.from(crypto.getRandomValues(new Uint8Array(32)))
             .map(b => b.toString(16).padStart(2, '0')).join('');
         }
       } catch (err) {
-        log(`Wallet signature rejected: ${err.message}`, 'error');
+        log(`Transaction signing error: ${err.message}`, 'error');
         btn.disabled = false;
         btn.textContent = 'Pay 1 CSPR & Execute x402 Compute';
         return;
