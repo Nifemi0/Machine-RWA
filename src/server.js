@@ -133,12 +133,36 @@ app.get('/status', (req, res) => {
  */
 app.post('/api/config/shareholders', (req, res) => {
   const { shareholders } = req.body || {};
-  if (Array.isArray(shareholders) && shareholders.length > 0) {
-    metrics.shareholders = shareholders;
-    saveMetrics();
-    return res.json({ success: true, shareholders: metrics.shareholders });
+  if (!Array.isArray(shareholders) || shareholders.length === 0) {
+    return res.status(400).json({ error: 'Invalid Shareholders Array', message: 'Must provide an array of shareholder objects.' });
   }
-  return res.status(400).json({ error: 'Invalid Shareholders Array' });
+
+  // Validate address format and calculate percentage total sum
+  let totalShare = 0;
+  for (const s of shareholders) {
+    if (!s.address || typeof s.address !== 'string' || !/^[a-fA-F0-9]{66}$/.test(s.address.trim())) {
+      return res.status(400).json({
+        error: 'Invalid Shareholder Address',
+        message: `Address "${s.address}" must be a 66-character hex Casper public key (starting with 01 or 02).`
+      });
+    }
+    const shareNum = Number(s.share);
+    if (isNaN(shareNum) || shareNum <= 0 || shareNum > 100) {
+      return res.status(400).json({ error: 'Invalid Share Weight', message: 'Each share weight must be between 1 and 100.' });
+    }
+    totalShare += shareNum;
+  }
+
+  if (totalShare !== 100) {
+    return res.status(400).json({
+      error: 'Share Weight Sum Error',
+      message: `Total share percentage sum must equal exactly 100%. Received sum of ${totalShare}%.`
+    });
+  }
+
+  metrics.shareholders = shareholders;
+  saveMetrics();
+  return res.json({ success: true, shareholders: metrics.shareholders });
 });
 
 /**

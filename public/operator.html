@@ -8,12 +8,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090e18;
-      --panel: #0d1422;
-      --panel-hover: #131c2e;
-      --border: #1e2c44;
+      --bg: #07090e;
+      --panel: #0d121c;
+      --panel-hover: #131b2a;
+      --border: #1b263b;
       --text: #ecdcb9;
-      --text-muted: #8ea1b5;
+      --text-muted: #8496a8;
       --accent-gold: #d4a964;
       --accent-teal: #3ba792;
     }
@@ -27,21 +27,35 @@
       font-size: 14px;
       line-height: 1.6;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .mono { font-family: 'JetBrains Mono', monospace; }
 
     .nav-header {
       border-bottom: 1px solid var(--border);
-      background: rgba(9, 14, 24, 0.92);
+      background: rgba(7, 9, 14, 0.95);
       backdrop-filter: blur(16px);
-      padding: 0 32px;
+      padding: 0 40px;
       height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky; top: 0; z-index: 50;
     }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+    }
+    .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-link.active { color: var(--accent-gold); background: rgba(212, 169, 100, 0.12); border: 1px solid rgba(212, 169, 100, 0.3); }
 
     .btn {
       background: var(--panel);
@@ -62,27 +76,34 @@
     
     .btn-gold {
       background: var(--accent-gold);
-      color: #090e18;
+      color: #07090e;
       border: 1px solid var(--accent-gold);
       font-weight: 700;
-    }
-
-    .input {
-      width: 100%;
-      background: #05080f;
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 13px;
-      font-family: 'JetBrains Mono', monospace;
     }
 
     .card {
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 24px;
+      padding: 28px;
+    }
+
+    .copy-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: var(--accent-gold); color: #07090e; }
+
+    .footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      background: rgba(7, 9, 14, 0.95);
+      padding: 40px 40px 32px;
     }
   </style>
 </head>
@@ -90,29 +111,32 @@
 
   <!-- Top Navigation -->
   <nav class="nav-header">
-    <div style="display:flex;align-items:center;gap:12px;">
+    <div style="display:flex;align-items:center;gap:14px;">
       <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;">
-        <div style="width:36px;height:36px;background:var(--accent-gold);color:#090e18;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">M</div>
+        <div style="width:36px;height:36px;background:var(--accent-gold);color:#07090e;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">M</div>
         <span style="font-weight:800;font-size:16px;letter-spacing:-0.3px;color:var(--text);">Machine RWA</span>
       </a>
-      <span style="font-size:11px;color:var(--accent-teal);margin-left:8px;" class="mono">Operator HUD</span>
+      <span style="font-size:11px;color:var(--accent-teal);" class="mono">Operator Dashboard</span>
     </div>
 
-    <div style="display:flex;align-items:center;gap:12px;">
-      <a href="compute.html" class="btn btn-gold">Compute Marketplace</a>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <a href="index.html" class="nav-link">Overview</a>
+      <a href="compute.html" class="nav-link">Compute Marketplace</a>
+      <a href="list-resource.html" class="nav-link">List Resource</a>
+      <a href="operator.html" class="nav-link active">Operator Dashboard</a>
     </div>
   </nav>
 
   <!-- Operator View -->
-  <main style="max-width:1100px;margin:40px auto 64px;padding:0 24px;display:grid;grid-template-columns:340px 1fr;gap:24px;">
+  <main style="max-width:1200px;margin:40px auto 64px;padding:0 32px;display:grid;grid-template-columns:360px 1fr;gap:32px;">
 
     <!-- Telemetry Cards -->
-    <div style="display:flex;flex-direction:column;gap:20px;">
+    <div style="display:flex;flex-direction:column;gap:24px;">
 
       <div class="card">
         <span style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;" class="mono">Accumulated Revenue</span>
         <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;">
-          <span style="font-size:34px;font-weight:800;color:var(--accent-gold);" class="mono" id="metric-revenue">0.000</span>
+          <span style="font-size:36px;font-weight:800;color:var(--accent-gold);" class="mono" id="metric-revenue">0.000</span>
           <span style="font-size:14px;color:var(--text-muted);" class="mono">CSPR</span>
         </div>
         <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;">
@@ -122,7 +146,7 @@
       </div>
 
       <div class="card" style="padding:0;overflow:hidden;">
-        <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">
+        <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;" class="mono">
           Real OS CPU Telemetry & Load
         </div>
         <div style="padding:4px 20px;">
@@ -150,8 +174,11 @@
       </div>
 
       <div class="card">
-        <span style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;" class="mono">Machine Agent Public Key</span>
-        <div style="margin-top:8px;background:#05080f;border:1px solid var(--border);border-radius:6px;padding:10px;word-break:break-all;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;" class="mono">Machine Agent Public Key</span>
+          <button onclick="copyAgentKey()" class="copy-btn" id="copy-agent-btn">Copy</button>
+        </div>
+        <div style="background:#04060a;border:1px solid var(--border);border-radius:6px;padding:10px;word-break:break-all;">
           <code id="agent-key" class="mono" style="font-size:11px;color:var(--accent-gold);">Loading...</code>
         </div>
       </div>
@@ -159,29 +186,21 @@
     </div>
 
     <!-- Shareholder Yield Split & Node Config -->
-    <div style="display:flex;flex-direction:column;gap:20px;">
+    <div style="display:flex;flex-direction:column;gap:24px;">
 
       <div class="card">
-        <h2 style="font-size:18px;font-weight:800;color:#fff;margin-bottom:14px;">Dynamic RWA Shareholder Yield Pool</h2>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+          <h2 style="font-size:20px;font-weight:800;color:#fff;">Dynamic RWA Shareholder Yield Pool</h2>
+          <a href="list-resource.html" class="btn" style="padding:6px 12px;font-size:11px;">Edit Configuration</a>
+        </div>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">
-          Revenue accumulated above 5.0 CSPR is automatically disbursed on Casper Testnet to these configured shareholder wallet accounts.
+          Revenue accumulated above 5.0 CSPR is automatically disbursed on Casper Testnet to these dynamically configured shareholder wallet accounts.
         </p>
 
+        <!-- Dynamic Shareholder Recipient List -->
         <div style="display:flex;flex-direction:column;gap:12px;" id="shareholders-list">
-          <div style="padding:14px;background:#05080f;border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <div style="font-size:12px;font-weight:700;" class="mono">01c238bdf5a5dbfb2b7692cd01828f26687a49c2182fb5b8403b262709e0d324b9</div>
-              <span style="font-size:11px;color:var(--text-muted);">Operator Node Weight</span>
-            </div>
-            <span style="font-weight:800;color:var(--accent-gold);" class="mono">60%</span>
-          </div>
-
-          <div style="padding:14px;background:#05080f;border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <div style="font-size:12px;font-weight:700;" class="mono">015fe42d789a12887d77ebaed26687a49c2182fb5b8403b262709e0d324b999990</div>
-              <span style="font-size:11px;color:var(--text-muted);">Backer Fractional Pool</span>
-            </div>
-            <span style="font-weight:800;color:var(--accent-teal);" class="mono">40%</span>
+          <div style="padding:14px;background:#04060a;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);" class="mono">
+            Loading configured shareholders from node API...
           </div>
         </div>
       </div>
@@ -190,7 +209,63 @@
 
   </main>
 
+  <!-- Complete Site Footer -->
+  <footer class="footer">
+    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:32px;">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <div style="width:28px;height:28px;background:var(--accent-gold);color:#07090e;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">M</div>
+          <span style="font-weight:800;font-size:16px;color:#fff;">Machine RWA</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);max-width:320px;">
+          DePIN hardware tokenization operating system on Casper Network. Built for Casper Agentic Buildathon 2026.
+        </p>
+      </div>
+
+      <div>
+        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Product</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <a href="compute.html" style="color:var(--text-muted);text-decoration:none;">Compute Marketplace</a>
+          <a href="list-resource.html" style="color:var(--text-muted);text-decoration:none;">List Hardware Resource</a>
+          <a href="operator.html" style="color:var(--text-muted);text-decoration:none;">Operator Dashboard</a>
+        </div>
+      </div>
+
+      <div>
+        <h4 style="font-size:12px;font-weight:700;color:var(--accent-teal);text-transform:uppercase;margin-bottom:12px;" class="mono">Casper Ecosystem</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <a href="https://cspr.click" target="_blank" style="color:var(--text-muted);text-decoration:none;">CSPR.click AI Skill</a>
+          <a href="https://testnet.cspr.live" target="_blank" style="color:var(--text-muted);text-decoration:none;">Casper Testnet Explorer</a>
+        </div>
+      </div>
+
+      <div>
+        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Developers</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+          <a href="https://github.com/Nifemi0/Machine-RWA" target="_blank" style="color:var(--text-muted);text-decoration:none;">GitHub Repository</a>
+          <a href="/status" target="_blank" style="color:var(--text-muted);text-decoration:none;">JSON Telemetry Endpoint</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width:1200px;margin:0 auto;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);" class="mono">
+      <span>© 2026 Machine RWA • Built on Casper Blockchain</span>
+      <span>Network Status: Testnet Connected</span>
+    </div>
+  </footer>
+
   <script>
+    let currentAgentKey = '';
+
+    function copyAgentKey() {
+      if (currentAgentKey) {
+        navigator.clipboard.writeText(currentAgentKey);
+        const btn = document.getElementById('copy-agent-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+      }
+    }
+
     async function fetchStatus() {
       try {
         const d = await fetch('/status').then(r => r.json());
@@ -200,7 +275,23 @@
         document.getElementById('metric-load').textContent = d.metrics.cpu_load_percent;
         document.getElementById('metric-proofs').textContent = d.metrics.redeemed_proofs_count || 0;
         document.getElementById('metric-uptime').textContent = d.metrics.uptime_seconds + 's';
+        
+        currentAgentKey = d.machineId;
         document.getElementById('agent-key').textContent = d.machineId;
+
+        // Render dynamic shareholder list from API
+        if (Array.isArray(d.metrics.shareholders)) {
+          const list = document.getElementById('shareholders-list');
+          list.innerHTML = d.metrics.shareholders.map((s, idx) => `
+            <div style="padding:16px;background:#04060a;border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text);" class="mono">${s.address}</div>
+                <span style="font-size:11px;color:var(--text-muted);">Shareholder Recipient #${idx + 1}</span>
+              </div>
+              <span style="font-weight:800;color:${idx === 0 ? 'var(--accent-gold)' : 'var(--accent-teal)'};font-size:16px;" class="mono">${s.share}%</span>
+            </div>
+          `).join('');
+        }
       } catch {}
     }
 
