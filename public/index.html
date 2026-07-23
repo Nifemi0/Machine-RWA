@@ -66,37 +66,37 @@
   </nav>
 
   <!-- Hero Header Section -->
-  <header class="relative w-full h-[500px] md:h-[600px] flex items-center justify-center border-b border-brand-border overflow-hidden bg-brand-bg">
+  <header class="relative w-full py-24 sm:py-32 md:py-40 flex items-center justify-center border-b border-brand-border overflow-hidden bg-brand-bg">
     <!-- Background Image -->
     <div class="absolute inset-0 z-0">
-      <img src="hero.jpeg" alt="Machine RWA Visual Architecture" class="w-full h-full object-cover object-center filter contrast-105 opacity-60">
+      <img src="hero.jpeg" alt="Machine RWA Visual Architecture" class="w-full h-full object-cover object-center filter contrast-105 opacity-50">
     </div>
     <!-- Dark Gradient Overlay -->
-    <div class="absolute inset-0 z-10 bg-gradient-to-b from-brand-bg/90 via-brand-bg/70 to-brand-bg"></div>
+    <div class="absolute inset-0 z-10 bg-gradient-to-b from-brand-bg/95 via-brand-bg/70 to-brand-bg"></div>
     <div class="hero-glow z-10"></div>
     
     <!-- Text & Value Prop -->
-    <div class="relative z-20 max-w-4xl mx-auto px-6 text-center space-y-6 flex flex-col items-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-mono font-bold tracking-wider uppercase backdrop-blur-sm">
-        <span class="w-2 h-2 rounded-full bg-brand-teal animate-pulse"></span>
-        Casper Buildathon 2026 • DePIN Franchise Blueprint
+    <div class="relative z-20 w-full max-w-[90%] md:max-w-4xl mx-auto px-4 text-center space-y-6 sm:space-y-8 flex flex-col items-center">
+      <div class="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-[clamp(0.6rem,2vw,0.75rem)] font-mono font-bold tracking-wider uppercase backdrop-blur-sm">
+        <span class="w-2 h-2 rounded-full bg-brand-teal animate-pulse shrink-0"></span>
+        <span class="truncate">Casper Buildathon 2026 • DePIN Blueprint</span>
       </div>
 
-      <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-lg">
-        Physical Hardware Tokenization &<br/>Autonomous Yield Franchises.
+      <h1 class="font-extrabold tracking-tight text-white leading-[1.1] drop-shadow-lg text-[clamp(2rem,6vw+1rem,4rem)]">
+        Physical Hardware Tokenization &<br class="hidden sm:block"/> Autonomous Yield Franchises.
       </h1>
 
-      <p class="text-slate-300 text-base md:text-lg leading-relaxed max-w-2xl drop-shadow">
+      <p class="text-slate-300 text-[clamp(0.875rem,2vw+0.5rem,1.125rem)] leading-relaxed max-w-2xl drop-shadow px-2">
         Machine RWA turns physical hardware into yield-bearing Real-World Assets. Autonomous AI agents pay for compute per request via native <strong class="text-brand-gold font-semibold">x402 HTTP Micropayments</strong>, while local daemons disburse accumulated CSPR yields.
       </p>
 
-      <div class="flex flex-col sm:flex-row gap-4 pt-4">
-        <a href="compute.html" class="px-6 py-3.5 rounded-xl bg-brand-gold hover:bg-brand-goldHover text-black font-bold text-sm transition shadow-lg shadow-brand-gold/20 flex items-center justify-center gap-2 w-full sm:w-auto">
-          Launch Compute Marketplace
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      <div class="flex flex-col sm:flex-row gap-4 pt-6 w-full sm:w-auto">
+        <a href="compute.html" class="px-8 py-4 rounded-xl bg-brand-gold hover:bg-brand-goldHover text-black font-bold text-[clamp(0.875rem,2vw,1rem)] transition shadow-lg shadow-brand-gold/20 flex items-center justify-center gap-2 w-full sm:w-auto">
+          Launch Marketplace
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
-        <a href="list-resource.html" class="px-6 py-3.5 rounded-xl bg-brand-card/80 backdrop-blur-sm hover:bg-brand-border text-slate-200 font-semibold text-sm border border-brand-border transition w-full sm:w-auto">
-          Tokenize Your Hardware
+        <a href="list-resource.html" class="px-8 py-4 rounded-xl bg-brand-card/80 backdrop-blur-sm hover:bg-brand-border text-slate-200 font-semibold text-[clamp(0.875rem,2vw,1rem)] border border-brand-border transition w-full sm:w-auto flex items-center justify-center">
+          Tokenize Hardware
         </a>
       </div>
     </div>
