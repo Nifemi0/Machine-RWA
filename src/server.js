@@ -284,53 +284,43 @@ app.post('/api/compute', async (req, res) => {
   let reasoning;
 
   // BYOK Support
-  if (userApiKey) {
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userApiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: 'Output ONLY JSON: { "analysis_summary": string, "risk_level": "LOW"|"MEDIUM"|"HIGH", "confidence_score": number, "requires_human_audit": boolean }' },
-            { role: 'user', content: sanitizedInput }
-          ],
-          response_format: { type: "json_object" }
-        })
-      });
-      if (response.ok) {
-        const data = await response.json();
-        reasoning = JSON.parse(data.choices[0].message.content);
-      }
-    } catch (e) {
-      console.warn('[MachineServer] BYOK API call failed, falling back to rule engine:', e.message);
-    }
+  if (!userApiKey) {
+    seenProofs.delete(paymentProof);
+    return res.status(401).json({
+      error: 'Missing API Key',
+      message: 'x-api-key header is required for production inference.'
+    });
   }
 
-  // Deterministic Rule Engine Fallback
-  if (!reasoning) {
-    const hasValuation = /\$?\d+(\.\d+)?[MkB]?/i.test(sanitizedInput);
-    const hasYield = /\d+(\.\d+)?%/i.test(sanitizedInput);
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userApiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: 'Output ONLY JSON: { "analysis_summary": string, "risk_level": "LOW"|"MEDIUM"|"HIGH", "confidence_score": number, "requires_human_audit": boolean }' },
+          { role: 'user', content: sanitizedInput }
+        ],
+        response_format: { type: "json_object" }
+      })
+    });
     
-    let confidence = 92;
-    let risk = "LOW";
-    let summary = "Quantitative machine engine verified valid asset valuation & yield metrics.";
-    
-    if (!hasValuation || !hasYield) {
-      confidence = 45;
-      risk = "HIGH";
-      summary = "Payload missing key quantitative yield/valuation metrics.";
+    if (!response.ok) {
+      throw new Error(`OpenAI API responded with status: ${response.status}`);
     }
-
-    reasoning = {
-      analysis_summary: summary,
-      risk_level: risk,
-      confidence_score: confidence,
-      requires_human_audit: confidence < 85
-    };
+    
+    const data = await response.json();
+    reasoning = JSON.parse(data.choices[0].message.content);
+  } catch (e) {
+    console.error('[MachineServer] BYOK API call failed:', e.message);
+    return res.status(502).json({
+      error: 'AI Inference Failed',
+      message: 'Failed to generate quantitative analysis from AI provider.'
+    });
   }
 
   if (reasoning.confidence_score < 85 || reasoning.requires_human_audit) {

@@ -172,16 +172,17 @@
             <div class="text-sm font-bold text-white">Casper Wallet Extension</div>
             <div class="text-[10px] font-mono text-slate-400">Browser Injected Extension</div>
           </div>
-          <span class="font-mono text-[10px] text-brand-teal bg-brand-teal/10 px-2 py-0.5 rounded border border-brand-teal/30">DETECTED</span>
+          <span class="font-mono text-[10px] text-brand-teal bg-brand-teal/10 px-2 py-0.5 rounded border border-brand-teal/30">CONNECT</span>
         </button>
 
-        <button onclick="connectCsprClick()" class="w-full p-4 rounded-xl bg-brand-surface border border-brand-gold/40 hover:border-brand-gold text-left flex items-center justify-between transition">
-          <div>
-            <div class="text-sm font-bold text-white">CSPR.click AI Agent Skill</div>
-            <div class="text-[10px] font-mono text-slate-400">Buildathon SDK Integration</div>
-          </div>
-          <span class="font-mono text-[10px] text-brand-gold bg-brand-gold/10 px-2 py-0.5 rounded border border-brand-gold/30">SDK AGENT</span>
-        </button>
+        <div class="pt-4 border-t border-brand-border space-y-2">
+            <div class="text-sm font-bold text-white">Manual Public Key Entry</div>
+            <div class="text-[10px] font-mono text-slate-400">For mobile or unsupported browsers</div>
+            <div class="flex gap-2">
+                <input type="text" id="manual-key-input" placeholder="01... or 02..." class="flex-1 bg-brand-bg border border-brand-border rounded-lg p-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-brand-gold">
+                <button onclick="connectManualKey()" class="px-4 py-2 rounded-lg bg-brand-gold hover:bg-brand-goldHover text-black font-bold text-xs transition">Connect</button>
+            </div>
+        </div>
       </div>
     </div>
   </div>
@@ -431,23 +432,26 @@
             closeWalletModal();
             return;
           }
+        } else {
+          log('Error: No Casper Wallet extension detected in this browser.', 'error');
         }
       } catch (e) {
-        log(`Casper Extension error: ${e.message}`, 'halt');
+        log(`Casper Extension error: ${e.message}`, 'error');
       }
-
-      userCasperAddress = "01c238bdf5a5dbfb2b7692cd01828f26687a49c2182fb5b8403b262709e0d324b9";
-      localStorage.setItem('connected_casper_wallet', userCasperAddress);
-      document.getElementById('wallet-btn-label').textContent = "01c238...324b9";
-      log(`Connected Account: ${userCasperAddress}`, 'success');
-      closeWalletModal();
     }
 
-    function connectCsprClick() {
-      userCasperAddress = "015fe42d789a12887d77ebaed26687a49c2182fb5b8403b262709e0d324b999990";
+    function connectManualKey() {
+      const keyInput = document.getElementById('manual-key-input').value.trim();
+      if (!keyInput || !/^[a-fA-F0-9]{66}$/.test(keyInput)) {
+        log('Error: Invalid Casper Public Key format.', 'error');
+        return;
+      }
+      userCasperAddress = keyInput;
       localStorage.setItem('connected_casper_wallet', userCasperAddress);
-      document.getElementById('wallet-btn-label').textContent = "015fe4...99990";
-      log(`Connected via CSPR.click Agent Skill: ${userCasperAddress}`, 'success');
+      document.getElementById('wallet-btn-label').textContent = `${userCasperAddress.slice(0, 6)}...${userCasperAddress.slice(-4)}`;
+      log(`Connected Manual Account: ${userCasperAddress}`, 'success');
+      closeWalletModal();
+    }
       closeWalletModal();
     }
 

@@ -148,12 +148,12 @@ async function verifyCasperDeployOnChain(deployHashHex, requiredMotes = 10000000
     const fetchDeploy = typeof rpc.getDeployInfo === 'function' ? rpc.getDeployInfo.bind(rpc) : (typeof rpc.getDeploy === 'function' ? rpc.getDeploy.bind(rpc) : null);
     
     if (!fetchDeploy) {
-      return { verified: true, pending: true, reason: 'RPC getDeploy method format verified.' };
+      return { verified: false, reason: 'Casper RPC client interface unavailable.' };
     }
 
     const deployInfo = await fetchDeploy(deployHashHex);
     if (!deployInfo || !deployInfo.execution_results || deployInfo.execution_results.length === 0) {
-      return { verified: true, pending: true, reason: 'Deploy is pending on Casper Testnet RPC.' };
+      return { verified: false, reason: 'Deploy not found or not yet executed/indexed on Casper Testnet RPC.' };
     }
 
     const execResult = deployInfo.execution_results[0].result;
@@ -163,9 +163,6 @@ async function verifyCasperDeployOnChain(deployHashHex, requiredMotes = 10000000
 
     return { verified: true, pending: false };
   } catch (e) {
-    if (e.message.includes('failed to send http request') || e.message.includes('Network Error') || e.message.includes('timeout')) {
-      return { verified: true, pending: true, reason: 'Casper RPC network timeout, accepted offline fallback.' };
-    }
     return { verified: false, reason: `Casper Testnet RPC error: ${e.message}` };
   }
 }
