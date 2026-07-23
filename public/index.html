@@ -66,48 +66,39 @@
   </nav>
 
   <!-- Hero Header Section -->
-  <header class="relative border-b border-brand-border overflow-hidden">
-    <div class="hero-glow"></div>
-    <div class="max-w-7xl mx-auto px-6 pt-12 pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-      
-      <!-- Text & Value Prop -->
-      <div class="lg:col-span-7 space-y-6">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-mono font-bold tracking-wider uppercase">
-          <span class="w-2 h-2 rounded-full bg-brand-teal animate-pulse"></span>
-          Casper Buildathon 2026 • DePIN Franchise Blueprint
-        </div>
-
-        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-          Physical Hardware Tokenization & Autonomous Yield Franchises.
-        </h1>
-
-        <p class="text-slate-300 text-base leading-relaxed">
-          Machine RWA turns physical hardware into yield-bearing Real-World Assets. Autonomous AI agents pay for compute per request via native <strong class="text-brand-gold font-semibold">x402 HTTP Micropayments</strong>, while local daemons disburse accumulated CSPR yields to Casper Testnet shareholders.
-        </p>
-
-        <div class="flex flex-wrap gap-4 pt-2">
-          <a href="compute.html" class="px-6 py-3 rounded-xl bg-brand-gold hover:bg-brand-goldHover text-black font-bold text-sm transition shadow-lg shadow-brand-gold/20 flex items-center gap-2">
-            Launch Compute Marketplace
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-          </a>
-          <a href="list-resource.html" class="px-6 py-3 rounded-xl bg-brand-card hover:bg-brand-border text-slate-200 font-semibold text-sm border border-brand-border transition">
-            Tokenize Your Hardware
-          </a>
-        </div>
+  <header class="relative w-full h-[500px] md:h-[600px] flex items-center justify-center border-b border-brand-border overflow-hidden bg-brand-bg">
+    <!-- Background Image -->
+    <div class="absolute inset-0 z-0">
+      <img src="hero.jpeg" alt="Machine RWA Visual Architecture" class="w-full h-full object-cover object-center filter contrast-105 opacity-60">
+    </div>
+    <!-- Dark Gradient Overlay -->
+    <div class="absolute inset-0 z-10 bg-gradient-to-b from-brand-bg/90 via-brand-bg/70 to-brand-bg"></div>
+    <div class="hero-glow z-10"></div>
+    
+    <!-- Text & Value Prop -->
+    <div class="relative z-20 max-w-4xl mx-auto px-6 text-center space-y-6 flex flex-col items-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-mono font-bold tracking-wider uppercase backdrop-blur-sm">
+        <span class="w-2 h-2 rounded-full bg-brand-teal animate-pulse"></span>
+        Casper Buildathon 2026 • DePIN Franchise Blueprint
       </div>
 
-      <!-- Hero Artwork Preview Card -->
-      <div class="lg:col-span-5">
-        <div class="rounded-2xl border border-brand-border bg-brand-card p-3 shadow-2xl relative group overflow-hidden">
-          <img src="hero.jpeg" alt="Machine RWA Visual Architecture" class="w-full h-80 object-cover rounded-xl filter contrast-105 group-hover:scale-105 transition duration-500">
-          <div class="absolute inset-0 bg-gradient-to-t from-brand-bg via-transparent to-transparent opacity-80"></div>
-          <div class="absolute bottom-6 left-6 right-6 flex items-center justify-between font-mono text-xs text-brand-gold">
-            <span>NETWORK: CASPER TESTNET</span>
-            <span class="text-brand-teal">VERIFIED DEPIN NODE</span>
-          </div>
-        </div>
-      </div>
+      <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-lg">
+        Physical Hardware Tokenization &<br/>Autonomous Yield Franchises.
+      </h1>
 
+      <p class="text-slate-300 text-base md:text-lg leading-relaxed max-w-2xl drop-shadow">
+        Machine RWA turns physical hardware into yield-bearing Real-World Assets. Autonomous AI agents pay for compute per request via native <strong class="text-brand-gold font-semibold">x402 HTTP Micropayments</strong>, while local daemons disburse accumulated CSPR yields.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 pt-4">
+        <a href="compute.html" class="px-6 py-3.5 rounded-xl bg-brand-gold hover:bg-brand-goldHover text-black font-bold text-sm transition shadow-lg shadow-brand-gold/20 flex items-center justify-center gap-2 w-full sm:w-auto">
+          Launch Compute Marketplace
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+        <a href="list-resource.html" class="px-6 py-3.5 rounded-xl bg-brand-card/80 backdrop-blur-sm hover:bg-brand-border text-slate-200 font-semibold text-sm border border-brand-border transition w-full sm:w-auto">
+          Tokenize Your Hardware
+        </a>
+      </div>
     </div>
   </header>
 
