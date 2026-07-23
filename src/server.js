@@ -122,6 +122,16 @@ setInterval(() => {
 }, 3000);
 setInterval(saveMetrics, 5000);
 
+// Keep-Alive Self-Ping (Prevents Render from spinning down due to inactivity)
+setInterval(() => {
+  const pingUrl = process.env.RENDER_EXTERNAL_URL || `http://127.0.0.1:${PORT}`;
+  fetch(`${pingUrl}/status`)
+    .then(res => {
+      if(res.ok) console.log(`[MachineServer] Keep-alive ping successful.`);
+    })
+    .catch(err => console.log(`[MachineServer] Keep-alive ping failed:`, err.message));
+}, 10 * 60 * 1000); // Ping every 10 minutes
+
 /**
  * 1. Health & Status Check Endpoint
  */
