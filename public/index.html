@@ -1,246 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Machine RWA — Tokenized Physical Hardware on Casper</title>
+  <title>Machine RWA — Tokenized Physical Compute Franchises on Casper</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#05070a',
+              surface: '#0a0e17',
+              card: '#0f1523',
+              border: '#1b253b',
+              gold: '#d4a964',
+              goldHover: '#c09650',
+              teal: '#3ba792',
+              muted: '#718096'
+            }
+          },
+          fontFamily: {
+            sans: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #07090e;
-      --panel: #0d121c;
-      --panel-hover: #131b2a;
-      --border: #1b263b;
-      --text: #ecdcb9;
-      --text-muted: #8496a8;
-      --accent-gold: #d4a964;
-      --accent-teal: #3ba792;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Space Grotesk', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 14px;
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .mono { font-family: 'JetBrains Mono', monospace; }
-
-    /* Full-width Hero Artwork Header */
-    .full-header-container {
-      position: relative;
-      width: 100%;
-      height: 520px;
-      overflow: hidden;
-      border-bottom: 1px solid var(--border);
-    }
-    .full-header-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-    }
-    .full-header-overlay {
+    body { background-color: #05070a; color: #f1f5f9; }
+    .hero-glow {
       position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom, rgba(7,9,14,0.3) 0%, rgba(7,9,14,0.85) 70%, rgba(7,9,14,1) 100%);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 24px 40px;
-    }
-
-    .nav-header-transparent {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-    }
-
-    .nav-link {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 8px;
-      transition: all 0.15s ease;
-    }
-    .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-    .nav-link.active { color: var(--accent-gold); background: rgba(212, 169, 100, 0.12); border: 1px solid rgba(212, 169, 100, 0.3); }
-
-    .btn {
-      background: var(--panel);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 18px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s ease;
-      text-decoration: none;
-    }
-    .btn:hover { background: var(--panel-hover); border-color: var(--accent-gold); transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
-    
-    .btn-gold {
-      background: var(--accent-gold);
-      color: #07090e;
-      border: 1px solid var(--accent-gold);
-      font-weight: 700;
-    }
-    .btn-gold:hover { background: #c2954f; border-color: #c2954f; }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px;
-      transition: border-color 0.2s ease;
-    }
-    .card:hover { border-color: var(--accent-gold); }
-
-    .footer {
-      margin-top: auto;
-      border-top: 1px solid var(--border);
-      background: rgba(7, 9, 14, 0.95);
-      padding: 40px 40px 32px;
-    }
-
-    @media (max-width: 900px) {
-      .full-header-overlay { padding: 20px; }
-      .grid-responsive { grid-template-columns: 1fr !important; }
-      .footer-grid { grid-template-columns: 1fr 1fr !important; }
+      top: -10%; left: 50%;
+      transform: translateX(-50%);
+      width: 800px; height: 400px;
+      background: radial-gradient(circle, rgba(212,169,100,0.12) 0%, rgba(59,167,146,0.06) 40%, rgba(5,7,10,0) 70%);
+      pointer-events: none;
     }
   </style>
 </head>
-<body>
+<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-brand-gold selection:text-black">
 
-  <!-- Full Header with Artwork as Background -->
-  <div class="full-header-container">
-    <img src="hero.jpeg" alt="Machine RWA Dithered Landscape Artwork Header" class="full-header-img">
-    <div class="full-header-overlay">
+  <!-- Top Navigation Bar -->
+  <nav class="border-b border-brand-border bg-brand-surface/90 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-brand-gold text-black rounded-lg flex items-center justify-center font-extrabold text-lg shadow-md shadow-brand-gold/20">M</div>
+        <div>
+          <span class="font-extrabold text-base tracking-tight text-white block leading-none">Machine RWA</span>
+          <span class="font-mono text-[10px] text-brand-teal tracking-wide">Casper DePIN Protocol</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-brand-gold bg-brand-gold/10 border border-brand-gold/30">Overview</a>
+        <a href="compute.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">Marketplace</a>
+        <a href="list-resource.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">List Hardware</a>
+        <a href="operator.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">Operator HUD</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Header Section -->
+  <header class="relative border-b border-brand-border overflow-hidden">
+    <div class="hero-glow"></div>
+    <div class="max-w-7xl mx-auto px-6 pt-12 pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
       
-      <!-- Top Transparent Navigation -->
-      <nav class="nav-header-transparent">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div style="width:36px;height:36px;background:var(--accent-gold);color:#07090e;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">M</div>
-          <div>
-            <span style="font-weight:800;font-size:16px;letter-spacing:-0.3px;color:#fff;">Machine RWA</span>
-            <span style="font-size:11px;color:var(--accent-teal);margin-left:8px;" class="mono">Casper Testnet DePIN</span>
-          </div>
+      <!-- Text & Value Prop -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-mono font-bold tracking-wider uppercase">
+          <span class="w-2 h-2 rounded-full bg-brand-teal animate-pulse"></span>
+          Casper Buildathon 2026 • DePIN Franchise Blueprint
         </div>
 
-        <div style="display:flex;align-items:center;gap:10px;">
-          <a href="index.html" class="nav-link active">Overview</a>
-          <a href="compute.html" class="nav-link">Compute Marketplace</a>
-          <a href="list-resource.html" class="nav-link">List Resource</a>
-          <a href="operator.html" class="nav-link">Operator Dashboard</a>
-        </div>
-      </nav>
-
-      <!-- Hero Text Content -->
-      <div style="max-width:860px;margin-bottom:20px;">
-        <span style="display:inline-block;font-size:11px;font-weight:700;color:var(--accent-gold);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px;" class="mono">
-          Casper Agentic Buildathon 2026 • DePIN Protocol Blueprint
-        </span>
-        <h1 style="font-size:42px;font-weight:800;letter-spacing:-1.2px;line-height:1.15;color:#fff;margin-bottom:14px;">
-          Tokenized Physical Hardware & Autonomous Yield Franchises.
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+          Physical Hardware Tokenization & Autonomous Yield Franchises.
         </h1>
-        <p style="font-size:16px;color:var(--text);opacity:0.95;margin-bottom:24px;max-width:760px;">
-          Transforming physical machine compute into yield-bearing Real World Assets. AI agents pay per request via native <strong style="color:var(--accent-gold);">x402 HTTP Micropayments</strong>, while autonomous daemons disburse yield to Casper Testnet shareholders.
+
+        <p class="text-slate-300 text-base leading-relaxed">
+          Machine RWA turns physical hardware into yield-bearing Real-World Assets. Autonomous AI agents pay for compute per request via native <strong class="text-brand-gold font-semibold">x402 HTTP Micropayments</strong>, while local daemons disburse accumulated CSPR yields to Casper Testnet shareholders.
         </p>
-        <div style="display:flex;gap:14px;">
-          <a href="compute.html" class="btn btn-gold" style="padding:12px 24px;font-size:14px;">Execute x402 Compute Job</a>
-          <a href="list-resource.html" class="btn" style="padding:12px 24px;font-size:14px;">List Hardware Resource</a>
+
+        <div class="flex flex-wrap gap-4 pt-2">
+          <a href="compute.html" class="px-6 py-3 rounded-xl bg-brand-gold hover:bg-brand-goldHover text-black font-bold text-sm transition shadow-lg shadow-brand-gold/20 flex items-center gap-2">
+            Launch Compute Marketplace
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </a>
+          <a href="list-resource.html" class="px-6 py-3 rounded-xl bg-brand-card hover:bg-brand-border text-slate-200 font-semibold text-sm border border-brand-border transition">
+            Tokenize Your Hardware
+          </a>
+        </div>
+      </div>
+
+      <!-- Hero Artwork Preview Card -->
+      <div class="lg:col-span-5">
+        <div class="rounded-2xl border border-brand-border bg-brand-card p-3 shadow-2xl relative group overflow-hidden">
+          <img src="hero.jpeg" alt="Machine RWA Visual Architecture" class="w-full h-80 object-cover rounded-xl filter contrast-105 group-hover:scale-105 transition duration-500">
+          <div class="absolute inset-0 bg-gradient-to-t from-brand-bg via-transparent to-transparent opacity-80"></div>
+          <div class="absolute bottom-6 left-6 right-6 flex items-center justify-between font-mono text-xs text-brand-gold">
+            <span>NETWORK: CASPER TESTNET</span>
+            <span class="text-brand-teal">VERIFIED DEPIN NODE</span>
+          </div>
         </div>
       </div>
 
     </div>
-  </div>
+  </header>
 
-  <!-- Key Architecture Features Grid (Responsive + Hover Effects) -->
-  <section style="max-width:1200px;margin:56px auto;padding:0 32px;display:grid;grid-template-columns:repeat(3, 1fr);gap:24px;" class="grid-responsive">
-    
-    <div class="card">
-      <div style="font-size:11px;font-weight:700;color:var(--accent-gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;" class="mono">Protocol Core 01</div>
-      <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;color:#fff;">x402 HTTP Micropayments</h3>
-      <p style="font-size:13px;color:var(--text-muted);">
-        Accountless machine-to-machine commerce using native HTTP headers (`x-payment-proof` and `x-payment-amount`) verified on Casper Testnet.
-      </p>
+  <!-- DePIN Protocol Features -->
+  <section class="max-w-7xl mx-auto px-6 py-16 w-full">
+    <div class="text-center max-w-2xl mx-auto mb-12 space-y-2">
+      <h2 class="text-xs font-mono font-bold text-brand-gold tracking-widest uppercase">Protocol Architecture</h2>
+      <p class="text-2xl font-bold text-white">Engineered for Machine-to-Machine Commerce</p>
     </div>
 
-    <div class="card">
-      <div style="font-size:11px;font-weight:700;color:var(--accent-teal);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;" class="mono">Protocol Core 02</div>
-      <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;color:#fff;">Quantitative Guardrails</h3>
-      <p style="font-size:13px;color:var(--text-muted);">
-        Deterministic AI reasoning self-scores confidence and automatically halts suspicious or hallucinated payload executions.
-      </p>
-    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <div class="p-8 rounded-2xl bg-brand-card border border-brand-border hover:border-brand-gold/50 transition space-y-4">
+        <div class="w-10 h-10 rounded-xl bg-brand-gold/10 border border-brand-gold/30 text-brand-gold flex items-center justify-center font-mono font-bold text-sm">01</div>
+        <h3 class="text-lg font-bold text-white">x402 Micropayments</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          Accountless HTTP 402 payment header verification. Machine requests require signed Casper transaction proofs before compute is released.
+        </p>
+      </div>
 
-    <div class="card">
-      <div style="font-size:11px;font-weight:700;color:var(--accent-gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;" class="mono">Protocol Core 03</div>
-      <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;color:#fff;">Autonomous Yield Daemon</h3>
-      <p style="font-size:13px;color:var(--text-muted);">
-        Background daemon monitors revenue accumulation and signs proportional CSPR payouts to fractional RWA shareholders.
-      </p>
-    </div>
+      <div class="p-8 rounded-2xl bg-brand-card border border-brand-border hover:border-brand-teal/50 transition space-y-4">
+        <div class="w-10 h-10 rounded-xl bg-brand-teal/10 border border-brand-teal/30 text-brand-teal flex items-center justify-center font-mono font-bold text-sm">02</div>
+        <h3 class="text-lg font-bold text-white">Quantitative Guardrails</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          Deterministic self-scoring AI risk engine halts execution if prompt payloads lack verified financial metrics or confidence drops below 85%.
+        </p>
+      </div>
 
+      <div class="p-8 rounded-2xl bg-brand-card border border-brand-border hover:border-brand-gold/50 transition space-y-4">
+        <div class="w-10 h-10 rounded-xl bg-brand-gold/10 border border-brand-gold/30 text-brand-gold flex items-center justify-center font-mono font-bold text-sm">03</div>
+        <h3 class="text-lg font-bold text-white">Autonomous Yield Daemon</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          Continuous background payout daemon disburses accumulated CSPR revenues to tokenized RWA shareholders once revenue hits 5 CSPR.
+        </p>
+      </div>
+
+    </div>
   </section>
 
   <!-- Complete Site Footer -->
-  <footer class="footer">
-    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:32px;" class="footer-grid">
-      <div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <div style="width:28px;height:28px;background:var(--accent-gold);color:#07090e;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">M</div>
-          <span style="font-weight:800;font-size:16px;color:#fff;">Machine RWA</span>
+  <footer class="mt-auto border-t border-brand-border bg-brand-surface py-12">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-xs text-slate-400">
+      <div class="space-y-3 md:col-span-1">
+        <div class="flex items-center gap-2 text-white font-extrabold text-sm">
+          <div class="w-6 h-6 bg-brand-gold text-black rounded flex items-center justify-center font-bold">M</div>
+          Machine RWA
         </div>
-        <p style="font-size:13px;color:var(--text-muted);max-width:320px;">
-          DePIN hardware tokenization operating system on Casper Network. Built for Casper Agentic Buildathon 2026.
-        </p>
+        <p class="leading-relaxed text-slate-500">DePIN hardware tokenization operating system on Casper Network. Built for Casper Agentic Buildathon 2026.</p>
       </div>
 
       <div>
-        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Product</h4>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-          <a href="compute.html" style="color:var(--text-muted);text-decoration:none;">Compute Marketplace</a>
-          <a href="list-resource.html" style="color:var(--text-muted);text-decoration:none;">List Hardware Resource</a>
-          <a href="operator.html" style="color:var(--text-muted);text-decoration:none;">Operator Dashboard</a>
-        </div>
+        <h4 class="font-mono font-bold text-brand-gold uppercase tracking-wider mb-3">Product</h4>
+        <ul class="space-y-2">
+          <li><a href="compute.html" class="hover:text-white transition">Compute Marketplace</a></li>
+          <li><a href="list-resource.html" class="hover:text-white transition">List Hardware Resource</a></li>
+          <li><a href="operator.html" class="hover:text-white transition">Operator Dashboard</a></li>
+        </ul>
       </div>
 
       <div>
-        <h4 style="font-size:12px;font-weight:700;color:var(--accent-teal);text-transform:uppercase;margin-bottom:12px;" class="mono">Casper Ecosystem</h4>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-          <a href="https://cspr.click" target="_blank" style="color:var(--text-muted);text-decoration:none;">CSPR.click AI Skill</a>
-          <a href="https://testnet.cspr.live" target="_blank" style="color:var(--text-muted);text-decoration:none;">Casper Testnet Explorer</a>
-        </div>
+        <h4 class="font-mono font-bold text-brand-teal uppercase tracking-wider mb-3">Ecosystem</h4>
+        <ul class="space-y-2">
+          <li><a href="https://cspr.click" target="_blank" class="hover:text-white transition">CSPR.click AI Skill</a></li>
+          <li><a href="https://testnet.cspr.live" target="_blank" class="hover:text-white transition">Casper Testnet Explorer</a></li>
+        </ul>
       </div>
 
       <div>
-        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Developers</h4>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-          <a href="https://github.com/Nifemi0/Machine-RWA" target="_blank" style="color:var(--text-muted);text-decoration:none;">GitHub Repository</a>
-          <a href="/status" target="_blank" style="color:var(--text-muted);text-decoration:none;">JSON Telemetry Endpoint</a>
-        </div>
+        <h4 class="font-mono font-bold text-brand-gold uppercase tracking-wider mb-3">Developers</h4>
+        <ul class="space-y-2">
+          <li><a href="https://github.com/Nifemi0/Machine-RWA" target="_blank" class="hover:text-white transition">GitHub Repository</a></li>
+          <li><a href="/status" target="_blank" class="hover:text-white transition">JSON Telemetry Endpoint</a></li>
+        </ul>
       </div>
     </div>
 
-    <div style="max-width:1200px;margin:0 auto;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);" class="mono">
+    <div class="max-w-7xl mx-auto px-6 pt-6 border-t border-brand-border/50 flex flex-col sm:flex-row justify-between items-center text-[11px] font-mono text-slate-500 gap-2">
       <span>© 2026 Machine RWA • Built on Casper Blockchain</span>
-      <span>Network Status: Testnet Connected</span>
+      <span class="text-brand-teal">Casper Testnet Active</span>
     </div>
   </footer>
 

@@ -1,207 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Machine RWA — Hardware Operator Dashboard</title>
+  <title>Operator Dashboard — Machine RWA</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#05070a',
+              surface: '#0a0e17',
+              card: '#0f1523',
+              border: '#1b263b',
+              gold: '#d4a964',
+              goldHover: '#c09650',
+              teal: '#3ba792',
+              rose: '#e65565'
+            }
+          },
+          fontFamily: {
+            sans: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #07090e;
-      --panel: #0d121c;
-      --panel-hover: #131b2a;
-      --border: #1b263b;
-      --text: #ecdcb9;
-      --text-muted: #8496a8;
-      --accent-gold: #d4a964;
-      --accent-teal: #3ba792;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Space Grotesk', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 14px;
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .mono { font-family: 'JetBrains Mono', monospace; }
-
-    .nav-header {
-      border-bottom: 1px solid var(--border);
-      background: rgba(7, 9, 14, 0.95);
-      backdrop-filter: blur(16px);
-      padding: 0 40px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky; top: 0; z-index: 50;
-    }
-
-    .nav-link {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 8px;
-      transition: all 0.15s ease;
-    }
-    .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-    .nav-link.active { color: var(--accent-gold); background: rgba(212, 169, 100, 0.12); border: 1px solid rgba(212, 169, 100, 0.3); }
-
-    .btn {
-      background: var(--panel);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 18px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s ease;
-      text-decoration: none;
-    }
-    .btn:hover { background: var(--panel-hover); border-color: var(--accent-gold); }
-    
-    .btn-gold {
-      background: var(--accent-gold);
-      color: #07090e;
-      border: 1px solid var(--accent-gold);
-      font-weight: 700;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px;
-    }
-
-    .copy-btn {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .copy-btn:hover { background: var(--accent-gold); color: #07090e; }
-
-    .footer {
-      margin-top: auto;
-      border-top: 1px solid var(--border);
-      background: rgba(7, 9, 14, 0.95);
-      padding: 40px 40px 32px;
-    }
+    body { background-color: #05070a; color: #f1f5f9; }
   </style>
 </head>
-<body>
+<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-brand-gold selection:text-black">
 
-  <!-- Top Navigation -->
-  <nav class="nav-header">
-    <div style="display:flex;align-items:center;gap:14px;">
-      <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;">
-        <div style="width:36px;height:36px;background:var(--accent-gold);color:#07090e;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">M</div>
-        <span style="font-weight:800;font-size:16px;letter-spacing:-0.3px;color:var(--text);">Machine RWA</span>
+  <!-- Top Navigation Bar -->
+  <nav class="border-b border-brand-border bg-brand-surface/90 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-brand-gold text-black rounded-lg flex items-center justify-center font-extrabold text-lg shadow-md shadow-brand-gold/20">M</div>
+        <div>
+          <span class="font-extrabold text-base tracking-tight text-white block leading-none">Machine RWA</span>
+          <span class="font-mono text-[10px] text-brand-teal tracking-wide">Operator Telemetry HUD</span>
+        </div>
       </a>
-      <span style="font-size:11px;color:var(--accent-teal);" class="mono">Operator Dashboard</span>
-    </div>
 
-    <div style="display:flex;align-items:center;gap:10px;">
-      <a href="index.html" class="nav-link">Overview</a>
-      <a href="compute.html" class="nav-link">Compute Marketplace</a>
-      <a href="list-resource.html" class="nav-link">List Resource</a>
-      <a href="operator.html" class="nav-link active">Operator Dashboard</a>
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">Overview</a>
+        <a href="compute.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">Marketplace</a>
+        <a href="list-resource.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">List Hardware</a>
+        <a href="operator.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-brand-gold bg-brand-gold/10 border border-brand-gold/30">Operator HUD</a>
+      </div>
     </div>
   </nav>
 
-  <!-- Operator View -->
-  <main style="max-width:1200px;margin:40px auto 64px;padding:0 32px;display:grid;grid-template-columns:360px 1fr;gap:32px;">
-
-    <!-- Telemetry Cards -->
-    <div style="display:flex;flex-direction:column;gap:24px;">
-
-      <div class="card">
-        <span style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;" class="mono">Accumulated Revenue</span>
-        <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;">
-          <span style="font-size:36px;font-weight:800;color:var(--accent-gold);" class="mono" id="metric-revenue">0.000</span>
-          <span style="font-size:14px;color:var(--text-muted);" class="mono">CSPR</span>
+  <!-- Main Operator Telemetry Layout -->
+  <main class="max-w-7xl mx-auto px-6 py-8 w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- Left Column: Metrics Overview -->
+    <div class="lg:col-span-4 space-y-6">
+      
+      <!-- Revenue Card -->
+      <div class="p-6 rounded-2xl bg-brand-card border border-brand-border space-y-3">
+        <span class="font-mono text-xs font-bold text-slate-400 uppercase tracking-wider">Accumulated Revenue</span>
+        <div class="flex items-baseline gap-2">
+          <span id="metric-revenue" class="text-4xl font-extrabold font-mono text-brand-gold">0.000</span>
+          <span class="font-mono text-sm text-slate-400">CSPR</span>
         </div>
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;">
-          <span style="color:var(--text-muted);">Payout Threshold</span>
-          <span style="font-weight:700;color:var(--accent-teal);" class="mono">5.0 CSPR</span>
+        <div class="pt-3 border-t border-brand-border flex items-center justify-between text-xs font-mono">
+          <span class="text-slate-400">Payout Threshold</span>
+          <span class="text-brand-teal font-bold">5.0 CSPR</span>
         </div>
       </div>
 
-      <div class="card" style="padding:0;overflow:hidden;">
-        <div style="padding:14px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;" class="mono">
+      <!-- Real OS CPU Telemetry -->
+      <div class="rounded-2xl bg-brand-card border border-brand-border overflow-hidden">
+        <div class="p-4 border-b border-brand-border font-mono text-xs font-bold text-slate-300 uppercase tracking-wider">
           Real OS CPU Telemetry & Load
         </div>
-        <div style="padding:4px 20px;">
-          <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
-            <span style="color:var(--text-muted);">Completed Inferences</span>
-            <span style="font-weight:700;" class="mono" id="metric-jobs">0</span>
+        <div class="p-4 space-y-3 text-xs">
+          <div class="flex justify-between border-b border-brand-border/60 pb-2.5">
+            <span class="text-slate-400">Completed Inferences</span>
+            <span id="metric-jobs" class="font-mono font-bold text-white">0</span>
           </div>
-          <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
-            <span style="color:var(--text-muted);">CPU Thermal Temp</span>
-            <span style="font-weight:700;" class="mono"><span id="metric-temp">--</span>°C</span>
+          <div class="flex justify-between border-b border-brand-border/60 pb-2.5">
+            <span class="text-slate-400">CPU Thermal Temp</span>
+            <span class="font-mono font-bold text-brand-gold"><span id="metric-temp">--</span>°C</span>
           </div>
-          <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
-            <span style="color:var(--text-muted);">CPU Load (%)</span>
-            <span style="font-weight:700;" class="mono"><span id="metric-load">--</span>%</span>
+          <div class="flex justify-between border-b border-brand-border/60 pb-2.5">
+            <span class="text-slate-400">CPU Load (%)</span>
+            <span class="font-mono font-bold text-brand-teal"><span id="metric-load">--</span>%</span>
           </div>
-          <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
-            <span style="color:var(--text-muted);">Redeemed Proofs (Replay Guard)</span>
-            <span style="font-weight:700;color:var(--accent-teal);" class="mono" id="metric-proofs">0</span>
+          <div class="flex justify-between border-b border-brand-border/60 pb-2.5">
+            <span class="text-slate-400">Redeemed Proofs (Replay Guard)</span>
+            <span id="metric-proofs" class="font-mono font-bold text-brand-teal">0</span>
           </div>
-          <div style="display:flex;justify-content:space-between;padding:12px 0;">
-            <span style="color:var(--text-muted);">Process Uptime</span>
-            <span style="font-weight:700;" class="mono" id="metric-uptime">0s</span>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Process Uptime</span>
+            <span id="metric-uptime" class="font-mono font-bold text-white">0s</span>
           </div>
         </div>
       </div>
 
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <span style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;" class="mono">Machine Agent Public Key</span>
-          <button onclick="copyAgentKey()" class="copy-btn" id="copy-agent-btn">Copy</button>
+      <!-- Agent Key Card -->
+      <div class="p-6 rounded-2xl bg-brand-card border border-brand-border space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="font-mono text-xs font-bold text-slate-400 uppercase tracking-wider">Machine Agent Public Key</span>
+          <button onclick="copyAgentKey()" id="copy-agent-btn" class="px-2.5 py-1 rounded bg-brand-surface border border-brand-border text-[11px] font-mono text-slate-300 hover:text-white hover:border-brand-gold transition">Copy</button>
         </div>
-        <div style="background:#04060a;border:1px solid var(--border);border-radius:6px;padding:10px;word-break:break-all;">
-          <code id="agent-key" class="mono" style="font-size:11px;color:var(--accent-gold);">Loading...</code>
+        <div class="p-3 rounded-xl bg-brand-bg border border-brand-border break-all font-mono text-xs text-brand-gold" id="agent-key">
+          Loading...
         </div>
       </div>
 
     </div>
 
-    <!-- Shareholder Yield Split & Node Config -->
-    <div style="display:flex;flex-direction:column;gap:24px;">
-
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);">
-          <h2 style="font-size:20px;font-weight:800;color:#fff;">Dynamic RWA Shareholder Yield Pool</h2>
-          <a href="list-resource.html" class="btn" style="padding:6px 12px;font-size:11px;">Edit Configuration</a>
+    <!-- Right Column: Shareholder Pool & Node Registry -->
+    <div class="lg:col-span-8 space-y-6">
+      
+      <!-- Shareholder Yield Distribution Pool -->
+      <div class="p-6 rounded-2xl bg-brand-card border border-brand-border space-y-5">
+        <div class="flex items-center justify-between border-b border-brand-border pb-4">
+          <div>
+            <h2 class="text-lg font-bold text-white">Dynamic RWA Shareholder Yield Pool</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Revenue accumulated above 5.0 CSPR is automatically disbursed on Casper Testnet to these configured shareholder wallets.</p>
+          </div>
+          <a href="list-resource.html" class="px-3 py-1.5 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-gold text-xs font-semibold text-slate-300 transition">Configure Pool</a>
         </div>
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">
-          Revenue accumulated above 5.0 CSPR is automatically disbursed on Casper Testnet to these dynamically configured shareholder wallet accounts.
-        </p>
 
-        <!-- Dynamic Shareholder Recipient List -->
-        <div style="display:flex;flex-direction:column;gap:12px;" id="shareholders-list">
-          <div style="padding:14px;background:#04060a;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);" class="mono">
+        <div id="shareholders-list" class="space-y-3">
+          <div class="p-4 rounded-xl bg-brand-bg border border-brand-border font-mono text-xs text-slate-400">
             Loading configured shareholders from node API...
           </div>
+        </div>
+      </div>
+
+      <!-- Registered DePIN Node Instances -->
+      <div class="p-6 rounded-2xl bg-brand-card border border-brand-border space-y-4">
+        <h2 class="text-lg font-bold text-white">Registered DePIN Node Instances</h2>
+        <div id="nodes-registered-list" class="space-y-3">
+          <!-- Dynamic registered nodes render here -->
         </div>
       </div>
 
@@ -210,47 +151,45 @@
   </main>
 
   <!-- Complete Site Footer -->
-  <footer class="footer">
-    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:32px;">
-      <div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <div style="width:28px;height:28px;background:var(--accent-gold);color:#07090e;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">M</div>
-          <span style="font-weight:800;font-size:16px;color:#fff;">Machine RWA</span>
+  <footer class="border-t border-brand-border bg-brand-surface py-12">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-xs text-slate-400">
+      <div class="space-y-3 md:col-span-1">
+        <div class="flex items-center gap-2 text-white font-extrabold text-sm">
+          <div class="w-6 h-6 bg-brand-gold text-black rounded flex items-center justify-center font-bold">M</div>
+          Machine RWA
         </div>
-        <p style="font-size:13px;color:var(--text-muted);max-width:320px;">
-          DePIN hardware tokenization operating system on Casper Network. Built for Casper Agentic Buildathon 2026.
-        </p>
+        <p class="leading-relaxed text-slate-500">DePIN hardware tokenization operating system on Casper Network. Built for Casper Agentic Buildathon 2026.</p>
       </div>
 
       <div>
-        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Product</h4>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-          <a href="compute.html" style="color:var(--text-muted);text-decoration:none;">Compute Marketplace</a>
-          <a href="list-resource.html" style="color:var(--text-muted);text-decoration:none;">List Hardware Resource</a>
-          <a href="operator.html" style="color:var(--text-muted);text-decoration:none;">Operator Dashboard</a>
-        </div>
+        <h4 class="font-mono font-bold text-brand-gold uppercase tracking-wider mb-3">Product</h4>
+        <ul class="space-y-2">
+          <li><a href="compute.html" class="hover:text-white transition">Compute Marketplace</a></li>
+          <li><a href="list-resource.html" class="hover:text-white transition">List Hardware Resource</a></li>
+          <li><a href="operator.html" class="hover:text-white transition">Operator Dashboard</a></li>
+        </ul>
       </div>
 
       <div>
-        <h4 style="font-size:12px;font-weight:700;color:var(--accent-teal);text-transform:uppercase;margin-bottom:12px;" class="mono">Casper Ecosystem</h4>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-          <a href="https://cspr.click" target="_blank" style="color:var(--text-muted);text-decoration:none;">CSPR.click AI Skill</a>
-          <a href="https://testnet.cspr.live" target="_blank" style="color:var(--text-muted);text-decoration:none;">Casper Testnet Explorer</a>
-        </div>
+        <h4 class="font-mono font-bold text-brand-teal uppercase tracking-wider mb-3">Ecosystem</h4>
+        <ul class="space-y-2">
+          <li><a href="https://cspr.click" target="_blank" class="hover:text-white transition">CSPR.click AI Skill</a></li>
+          <li><a href="https://testnet.cspr.live" target="_blank" class="hover:text-white transition">Casper Testnet Explorer</a></li>
+        </ul>
       </div>
 
       <div>
-        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Developers</h4>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-          <a href="https://github.com/Nifemi0/Machine-RWA" target="_blank" style="color:var(--text-muted);text-decoration:none;">GitHub Repository</a>
-          <a href="/status" target="_blank" style="color:var(--text-muted);text-decoration:none;">JSON Telemetry Endpoint</a>
-        </div>
+        <h4 class="font-mono font-bold text-brand-gold uppercase tracking-wider mb-3">Developers</h4>
+        <ul class="space-y-2">
+          <li><a href="https://github.com/Nifemi0/Machine-RWA" target="_blank" class="hover:text-white transition">GitHub Repository</a></li>
+          <li><a href="/status" target="_blank" class="hover:text-white transition">JSON Telemetry Endpoint</a></li>
+        </ul>
       </div>
     </div>
 
-    <div style="max-width:1200px;margin:0 auto;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);" class="mono">
+    <div class="max-w-7xl mx-auto px-6 pt-6 border-t border-brand-border/50 flex flex-col sm:flex-row justify-between items-center text-[11px] font-mono text-slate-500 gap-2">
       <span>© 2026 Machine RWA • Built on Casper Blockchain</span>
-      <span>Network Status: Testnet Connected</span>
+      <span class="text-brand-teal">Casper Testnet Active</span>
     </div>
   </footer>
 
@@ -279,16 +218,30 @@
         currentAgentKey = d.machineId;
         document.getElementById('agent-key').textContent = d.machineId;
 
-        // Render dynamic shareholder list from API
+        // Render dynamic shareholder list
         if (Array.isArray(d.metrics.shareholders)) {
           const list = document.getElementById('shareholders-list');
           list.innerHTML = d.metrics.shareholders.map((s, idx) => `
-            <div style="padding:16px;background:#04060a;border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+            <div class="p-4 rounded-xl bg-brand-bg border border-brand-border flex items-center justify-between">
               <div>
-                <div style="font-size:12px;font-weight:700;color:var(--text);" class="mono">${s.address}</div>
-                <span style="font-size:11px;color:var(--text-muted);">Shareholder Recipient #${idx + 1}</span>
+                <div class="font-mono text-xs font-bold text-slate-200 break-all">${s.address}</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Shareholder Recipient #${idx + 1}</div>
               </div>
-              <span style="font-weight:800;color:${idx === 0 ? 'var(--accent-gold)' : 'var(--accent-teal)'};font-size:16px;" class="mono">${s.share}%</span>
+              <span class="font-mono font-extrabold text-base ${idx === 0 ? 'text-brand-gold' : 'text-brand-teal'} ml-4">${s.share}%</span>
+            </div>
+          `).join('');
+        }
+
+        // Render registered node instances
+        if (Array.isArray(d.metrics.listedNodes)) {
+          const nodeContainer = document.getElementById('nodes-registered-list');
+          nodeContainer.innerHTML = d.metrics.listedNodes.map(node => `
+            <div class="p-4 rounded-xl bg-brand-bg border border-brand-border space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs font-bold text-white">${node.title}</span>
+                <span class="font-mono text-[10px] text-brand-teal bg-brand-teal/10 px-2 py-0.5 rounded border border-brand-teal/20">${node.status}</span>
+              </div>
+              <div class="text-xs font-mono text-slate-400">${node.type} • Fee: ${Number(node.feeMotes)/1e9} CSPR</div>
             </div>
           `).join('');
         }

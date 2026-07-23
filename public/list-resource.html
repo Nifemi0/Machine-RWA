@@ -1,271 +1,215 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>List Hardware Resource — Machine RWA</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#05070a',
+              surface: '#0a0e17',
+              card: '#0f1523',
+              border: '#1b263b',
+              gold: '#d4a964',
+              goldHover: '#c09650',
+              teal: '#3ba792',
+              rose: '#e65565'
+            }
+          },
+          fontFamily: {
+            sans: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #07090e;
-      --panel: #0d121c;
-      --panel-hover: #131b2a;
-      --border: #1b263b;
-      --text: #ecdcb9;
-      --text-muted: #8496a8;
-      --accent-gold: #d4a964;
-      --accent-teal: #3ba792;
-      --accent-rose: #e65565;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Space Grotesk', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 14px;
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .mono { font-family: 'JetBrains Mono', monospace; }
-
-    .nav-header {
-      border-bottom: 1px solid var(--border);
-      background: rgba(7, 9, 14, 0.95);
-      backdrop-filter: blur(16px);
-      padding: 0 40px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky; top: 0; z-index: 50;
-    }
-
-    .btn {
-      background: var(--panel);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 18px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s ease;
-      text-decoration: none;
-    }
-    .btn:hover { background: var(--panel-hover); border-color: var(--accent-gold); }
-    
-    .btn-gold {
-      background: var(--accent-gold);
-      color: #07090e;
-      border: 1px solid var(--accent-gold);
-      font-weight: 700;
-    }
-    .btn-gold:hover { background: #c2954f; border-color: #c2954f; }
-
-    .input {
-      width: 100%;
-      background: #04060a;
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 13px;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .input:focus { outline: none; border-color: var(--accent-gold); }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 32px;
-    }
-
-    .shareholder-card {
-      background: #04060a;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .footer {
-      margin-top: auto;
-      border-top: 1px solid var(--border);
-      background: rgba(7, 9, 14, 0.95);
-      padding: 40px 40px 32px;
-    }
+    body { background-color: #05070a; color: #f1f5f9; }
   </style>
 </head>
-<body>
+<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-brand-gold selection:text-black">
 
-  <!-- Top Navigation -->
-  <nav class="nav-header">
-    <div style="display:flex;align-items:center;gap:14px;">
-      <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;">
-        <div style="width:36px;height:36px;background:var(--accent-gold);color:#07090e;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">M</div>
-        <span style="font-weight:800;font-size:16px;letter-spacing:-0.3px;color:var(--text);">Machine RWA</span>
+  <!-- Top Navigation Bar -->
+  <nav class="border-b border-brand-border bg-brand-surface/90 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-brand-gold text-black rounded-lg flex items-center justify-center font-extrabold text-lg shadow-md shadow-brand-gold/20">M</div>
+        <div>
+          <span class="font-extrabold text-base tracking-tight text-white block leading-none">Machine RWA</span>
+          <span class="font-mono text-[10px] text-brand-teal tracking-wide">Resource Listing Portal</span>
+        </div>
       </a>
-      <span style="font-size:11px;color:var(--accent-teal);" class="mono">Resource Listing Portal</span>
-    </div>
 
-    <div style="display:flex;align-items:center;gap:14px;">
-      <a href="compute.html" class="btn">Compute Marketplace</a>
-      <a href="operator.html" class="btn">Operator Dashboard</a>
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">Overview</a>
+        <a href="compute.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">Marketplace</a>
+        <a href="list-resource.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-brand-gold bg-brand-gold/10 border border-brand-gold/30">List Hardware</a>
+        <a href="operator.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">Operator HUD</a>
+      </div>
     </div>
   </nav>
 
-  <!-- Spacious 2-Column Hardware Listing View -->
-  <main style="max-width:1200px;margin:36px auto 64px;padding:0 32px;display:grid;grid-template-columns:1fr 400px;gap:32px;">
+  <!-- Main Listing Portal Layout -->
+  <main class="max-w-7xl mx-auto px-6 py-8 w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8">
     
-    <!-- Left Column: Primary Registration Form -->
-    <div class="card">
-      <div style="margin-bottom:28px;padding-bottom:18px;border-bottom:1px solid var(--border);">
-        <h1 style="font-size:26px;font-weight:800;color:#fff;">List Physical Hardware Resource</h1>
-        <p style="font-size:14px;color:var(--text-muted);margin-top:4px;">
-          Register your physical machine node into the Casper DePIN franchise network and define your yield payout weights.
-        </p>
-      </div>
-
-      <form id="resource-form" onsubmit="handleResourceSubmit(event)" style="display:flex;flex-direction:column;gap:22px;">
-        
-        <div>
-          <label style="display:block;font-size:12px;font-weight:700;color:var(--accent-gold);margin-bottom:8px;" class="mono">01. HARDWARE RESOURCE TITLE</label>
-          <input type="text" id="node-title" value="Machine-Node-Alpha (CPU Quantitative Inference)" class="input" placeholder="e.g. NVIDIA RTX 4090 / Solar Oracle #04" required>
+    <!-- Left Column: Registration Form -->
+    <div class="lg:col-span-8 space-y-6">
+      <div class="p-8 rounded-2xl bg-brand-card border border-brand-border space-y-6">
+        <div class="border-b border-brand-border pb-4 space-y-1">
+          <h1 class="text-2xl font-extrabold text-white">Tokenize Physical Hardware Resource</h1>
+          <p class="text-xs text-slate-400">Register a machine node into the Casper DePIN franchise network and define shareholder yield shares.</p>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <form id="resource-form" onsubmit="handleResourceSubmit(event)" class="space-y-6">
+          
           <div>
-            <label style="display:block;font-size:12px;font-weight:700;color:var(--accent-teal);margin-bottom:8px;" class="mono">02. INFRASTRUCTURE TYPE</label>
-            <select id="node-category" class="input" style="cursor:pointer;">
-              <option value="CPU Quantitative Inference Node">CPU Quantitative Inference Node</option>
-              <option value="IoT Solar & Sensor Telemetry Oracle">IoT Solar & Sensor Telemetry Oracle</option>
-              <option value="Render & Compute Cluster">Render & Compute Cluster</option>
-              <option value="Custom Hardware Franchise">Custom Hardware Franchise</option>
-            </select>
-          </div>
-          <div>
-            <label style="display:block;font-size:12px;font-weight:700;color:var(--accent-gold);margin-bottom:8px;" class="mono">03. MINIMUM FEE (MOTES)</label>
-            <input type="number" id="node-fee" value="1000000000" class="input" required>
-          </div>
-        </div>
-
-        <div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-            <label style="font-size:12px;font-weight:700;color:var(--accent-gold);" class="mono">04. SHAREHOLDER WALLET RECIPIENTS & WEIGHTS</label>
-            <button type="button" onclick="addShareholderCard()" class="btn" style="padding:6px 12px;font-size:11px;">+ Add Recipient Wallet</button>
+            <label class="block font-mono text-xs font-bold text-brand-gold uppercase tracking-wider mb-2">01. Node Hardware Title</label>
+            <input type="text" id="node-title" value="Machine-Node-Alpha (CPU Quantitative Inference)" required class="w-full bg-brand-bg border border-brand-border rounded-xl p-3 text-xs font-mono text-white focus:outline-none focus:border-brand-gold transition" placeholder="e.g. RTX 4090 Cluster / Solar Oracle #04">
           </div>
 
-          <div style="display:flex;flex-direction:column;gap:12px;" id="shareholders-container">
-            
-            <div class="shareholder-card">
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:11px;font-weight:700;color:var(--accent-gold);" class="mono">RECIPIENT #1 (OPERATOR NODE)</span>
-                <span style="font-size:11px;color:var(--accent-teal);" class="mono">AUTO-DETECTED WALLET</span>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 140px;gap:12px;">
-                <input type="text" class="input sh-address" id="operator-wallet-input" value="01c238bdf5a5dbfb2b7692cd01828f26687a49c2182fb5b8403b262709e0d324b9" placeholder="01... Casper Account" required>
-                <input type="number" class="input sh-share" value="60" placeholder="Share %" min="1" max="100" required style="color:var(--accent-gold);text-align:center;">
-              </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-mono text-xs font-bold text-brand-teal uppercase tracking-wider mb-2">02. Infrastructure Type</label>
+              <select id="node-category" class="w-full bg-brand-bg border border-brand-border rounded-xl p-3 text-xs font-mono text-white focus:outline-none focus:border-brand-gold cursor-pointer">
+                <option value="CPU Quantitative Inference Node">CPU Quantitative Inference Node</option>
+                <option value="IoT Solar & Sensor Telemetry Oracle">IoT Solar & Sensor Telemetry Oracle</option>
+                <option value="Render & Compute Cluster">Render & Compute Cluster</option>
+                <option value="Custom Hardware Franchise">Custom Hardware Franchise</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-mono text-xs font-bold text-brand-gold uppercase tracking-wider mb-2">03. Minimum Fee (Motes)</label>
+              <input type="number" id="node-fee" value="1000000000" required class="w-full bg-brand-bg border border-brand-border rounded-xl p-3 text-xs font-mono text-brand-gold focus:outline-none focus:border-brand-gold">
+            </div>
+          </div>
+
+          <!-- Shareholder Recipients Section -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="font-mono text-xs font-bold text-brand-gold uppercase tracking-wider">04. Shareholder Revenue Recipient Pool</label>
+              <button type="button" onclick="addShareholderCard()" class="px-3 py-1 rounded.lg bg-brand-surface border border-brand-border hover:border-brand-gold text-xs font-semibold text-slate-300 transition">+ Add Recipient</button>
             </div>
 
-            <div class="shareholder-card">
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:11px;font-weight:700;color:var(--accent-teal);" class="mono">RECIPIENT #2 (BACKER FRACTIONAL POOL)</span>
-                <button type="button" onclick="this.closest('.shareholder-card').remove()" style="background:none;border:none;color:var(--accent-rose);cursor:pointer;font-size:12px;">Remove</button>
+            <!-- Dynamic Shareholder Cards Container -->
+            <div id="shareholders-container" class="space-y-3">
+              
+              <div class="shareholder-card p-4 rounded-xl bg-brand-bg border border-brand-border space-y-2">
+                <div class="flex items-center justify-between text-[11px] font-mono">
+                  <span class="text-brand-gold font-bold">RECIPIENT #1 (OPERATOR NODE)</span>
+                  <span class="text-brand-teal">CONNECTED WALLET</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                  <input type="text" class="sm:col-span-9 bg-brand-surface border border-brand-border rounded-lg p-2.5 text-xs font-mono text-slate-200 focus:outline-none sh-address" id="operator-wallet-input" value="01c238bdf5a5dbfb2b7692cd01828f26687a49c2182fb5b8403b262709e0d324b9" required>
+                  <div class="sm:col-span-3 flex items-center gap-2">
+                    <input type="number" oninput="updateShareSumBar()" class="w-full bg-brand-surface border border-brand-border rounded-lg p-2.5 text-xs font-mono text-brand-gold font-bold text-center focus:outline-none sh-share" value="60" min="1" max="100" required>
+                    <span class="text-xs font-mono text-slate-400">%</span>
+                  </div>
+                </div>
               </div>
-              <div style="display:grid;grid-template-columns:1fr 140px;gap:12px;">
-                <input type="text" class="input sh-address" value="015fe42d789a12887d77ebaed26687a49c2182fb5b8403b262709e0d324b999990" placeholder="01... Casper Account" required>
-                <input type="number" class="input sh-share" value="40" placeholder="Share %" min="1" max="100" required style="color:var(--accent-teal);text-align:center;">
+
+              <div class="shareholder-card p-4 rounded-xl bg-brand-bg border border-brand-border space-y-2">
+                <div class="flex items-center justify-between text-[11px] font-mono">
+                  <span class="text-brand-teal font-bold">RECIPIENT #2 (BACKER POOL)</span>
+                  <button type="button" onclick="this.closest('.shareholder-card').remove(); updateShareSumBar();" class="text-brand-rose hover:underline text-[11px]">Remove</button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                  <input type="text" class="sm:col-span-9 bg-brand-surface border border-brand-border rounded-lg p-2.5 text-xs font-mono text-slate-200 focus:outline-none sh-address" value="015fe42d789a12887d77ebaed26687a49c2182fb5b8403b262709e0d324b999990" required>
+                  <div class="sm:col-span-3 flex items-center gap-2">
+                    <input type="number" oninput="updateShareSumBar()" class="w-full bg-brand-surface border border-brand-border rounded-lg p-2.5 text-xs font-mono text-brand-teal font-bold text-center focus:outline-none sh-share" value="40" min="1" max="100" required>
+                    <span class="text-xs font-mono text-slate-400">%</span>
+                  </div>
+                </div>
               </div>
+
             </div>
 
+            <!-- Share Percentage Sum Meter -->
+            <div class="p-3.5 rounded-xl bg-brand-bg border border-brand-border space-y-2">
+              <div class="flex justify-between items-center text-xs font-mono">
+                <span class="text-slate-400">Total Shareholder Allocation:</span>
+                <span id="sum-text" class="font-bold text-brand-teal">100% (Valid)</span>
+              </div>
+              <div class="w-full bg-brand-surface h-2 rounded-full overflow-hidden border border-brand-border">
+                <div id="sum-bar" class="bg-brand-teal h-full transition-all duration-300 w-full"></div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div style="padding-top:12px;">
-          <button type="submit" id="btn-submit-listing" class="btn btn-gold" style="width:100%;justify-content:center;padding:14px;font-size:14px;">
-            Save & Deploy Configuration to Node
+          <button type="submit" id="btn-submit-listing" class="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-goldHover text-black font-extrabold text-sm transition shadow-lg shadow-brand-gold/20 flex items-center justify-center gap-2">
+            <span>Publish Node & Deploy Shareholder Config</span>
           </button>
-        </div>
 
-        <div id="status-msg" style="display:none;padding:14px;background:#04060a;border:1px solid var(--accent-teal);border-radius:8px;color:var(--accent-teal);font-size:12px;" class="mono"></div>
+          <div id="status-msg" class="hidden p-4 rounded-xl bg-brand-surface border border-brand-teal text-brand-teal font-mono text-xs"></div>
 
-      </form>
+        </form>
+      </div>
     </div>
 
-    <!-- Right Column: Protocol Guidelines & Wallet Identity -->
-    <div style="display:flex;flex-direction:column;gap:24px;">
-      
-      <div class="card">
-        <h3 style="font-size:16px;font-weight:700;color:#fff;margin-bottom:12px;">Casper Shareholder Policy</h3>
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
-          When x402 revenue accumulated by your machine reaches <strong style="color:var(--accent-gold);">5.0 CSPR</strong>, the local daemon automatically executes proportional CSPR transfer deploys to every listed address.
+    <!-- Right Column: Protocol Rules & Policy -->
+    <div class="lg:col-span-4 space-y-6">
+      <div class="p-6 rounded-2xl bg-brand-card border border-brand-border space-y-4">
+        <h3 class="text-base font-bold text-white">Casper Yield Policy Guidelines</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          When accumulated x402 revenue for this hardware node crosses <strong class="text-brand-gold font-semibold">5.0 CSPR</strong>, the machine daemon triggers proportional CSPR transfer deploys to every listed address.
         </p>
 
-        <div style="padding:14px;background:#04060a;border:1px solid var(--border);border-radius:8px;font-size:12px;" class="mono">
-          <div style="color:var(--accent-teal);margin-bottom:4px;">Connected Operator Wallet:</div>
-          <div id="active-operator-display" style="word-break:break-all;color:var(--text-muted);">01c238...324b9</div>
+        <div class="p-3.5 rounded-xl bg-brand-bg border border-brand-border font-mono text-xs space-y-1">
+          <div class="text-brand-teal font-semibold">Operator Address:</div>
+          <div id="active-operator-display" class="text-slate-400 break-all text-[11px]">01c238...324b9</div>
         </div>
       </div>
-
     </div>
 
   </main>
 
   <!-- Complete Site Footer -->
-  <footer class="footer">
-    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:32px;">
-      <div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <div style="width:28px;height:28px;background:var(--accent-gold);color:#07090e;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">M</div>
-          <span style="font-weight:800;font-size:16px;color:#fff;">Machine RWA</span>
+  <footer class="border-t border-brand-border bg-brand-surface py-12">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-xs text-slate-400">
+      <div class="space-y-3 md:col-span-1">
+        <div class="flex items-center gap-2 text-white font-extrabold text-sm">
+          <div class="w-6 h-6 bg-brand-gold text-black rounded flex items-center justify-center font-bold">M</div>
+          Machine RWA
         </div>
-        <p style="font-size:13px;color:var(--text-muted);max-width:320px;">
-          DePIN hardware tokenization operating system on Casper Network. Built for Casper Agentic Buildathon 2026.
-        </p>
+        <p class="leading-relaxed text-slate-500">DePIN hardware tokenization operating system on Casper Network. Built for Casper Agentic Buildathon 2026.</p>
       </div>
 
       <div>
-        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Product</h4>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-          <a href="compute.html" style="color:var(--text-muted);text-decoration:none;">Compute Marketplace</a>
-          <a href="list-resource.html" style="color:var(--text-muted);text-decoration:none;">List Hardware Resource</a>
-          <a href="operator.html" style="color:var(--text-muted);text-decoration:none;">Operator Dashboard</a>
-        </div>
+        <h4 class="font-mono font-bold text-brand-gold uppercase tracking-wider mb-3">Product</h4>
+        <ul class="space-y-2">
+          <li><a href="compute.html" class="hover:text-white transition">Compute Marketplace</a></li>
+          <li><a href="list-resource.html" class="hover:text-white transition">List Hardware Resource</a></li>
+          <li><a href="operator.html" class="hover:text-white transition">Operator Dashboard</a></li>
+        </ul>
       </div>
 
       <div>
-        <h4 style="font-size:12px;font-weight:700;color:var(--accent-teal);text-transform:uppercase;margin-bottom:12px;" class="mono">Casper Ecosystem</h4>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-          <a href="https://cspr.click" target="_blank" style="color:var(--text-muted);text-decoration:none;">CSPR.click AI Skill</a>
-          <a href="https://testnet.cspr.live" target="_blank" style="color:var(--text-muted);text-decoration:none;">Casper Testnet Explorer</a>
-        </div>
+        <h4 class="font-mono font-bold text-brand-teal uppercase tracking-wider mb-3">Ecosystem</h4>
+        <ul class="space-y-2">
+          <li><a href="https://cspr.click" target="_blank" class="hover:text-white transition">CSPR.click AI Skill</a></li>
+          <li><a href="https://testnet.cspr.live" target="_blank" class="hover:text-white transition">Casper Testnet Explorer</a></li>
+        </ul>
       </div>
 
       <div>
-        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Developers</h4>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-          <a href="https://github.com/Nifemi0/Machine-RWA" target="_blank" style="color:var(--text-muted);text-decoration:none;">GitHub Repository</a>
-          <a href="/status" target="_blank" style="color:var(--text-muted);text-decoration:none;">JSON Telemetry Endpoint</a>
-        </div>
+        <h4 class="font-mono font-bold text-brand-gold uppercase tracking-wider mb-3">Developers</h4>
+        <ul class="space-y-2">
+          <li><a href="https://github.com/Nifemi0/Machine-RWA" target="_blank" class="hover:text-white transition">GitHub Repository</a></li>
+          <li><a href="/status" target="_blank" class="hover:text-white transition">JSON Telemetry Endpoint</a></li>
+        </ul>
       </div>
     </div>
 
-    <div style="max-width:1200px;margin:0 auto;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);" class="mono">
+    <div class="max-w-7xl mx-auto px-6 pt-6 border-t border-brand-border/50 flex flex-col sm:flex-row justify-between items-center text-[11px] font-mono text-slate-500 gap-2">
       <span>© 2026 Machine RWA • Built on Casper Blockchain</span>
-      <span>Network Status: Testnet Connected</span>
+      <span class="text-brand-teal">Casper Testnet Active</span>
     </div>
   </footer>
 
@@ -280,18 +224,49 @@
       const container = document.getElementById('shareholders-container');
       const count = container.children.length + 1;
       const card = document.createElement('div');
-      card.className = 'shareholder-card';
+      card.className = 'shareholder-card p-4 rounded-xl bg-brand-bg border border-brand-border space-y-2';
       card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:11px;font-weight:700;color:var(--accent-gold);" class="mono">RECIPIENT #${count}</span>
-          <button type="button" onclick="this.closest('.shareholder-card').remove()" style="background:none;border:none;color:var(--accent-rose);cursor:pointer;font-size:12px;">Remove</button>
+        <div class="flex items-center justify-between text-[11px] font-mono">
+          <span class="text-brand-gold font-bold">RECIPIENT #${count}</span>
+          <button type="button" onclick="this.closest('.shareholder-card').remove(); updateShareSumBar();" class="text-brand-rose hover:underline text-[11px]">Remove</button>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 140px;gap:12px;">
-          <input type="text" class="input sh-address" placeholder="01... Casper Account" required>
-          <input type="number" class="input sh-share" placeholder="Share %" min="1" max="100" required style="color:var(--accent-teal);text-align:center;">
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+          <input type="text" class="sm:col-span-9 bg-brand-surface border border-brand-border rounded-lg p-2.5 text-xs font-mono text-slate-200 focus:outline-none sh-address" placeholder="01... Casper Account" required>
+          <div class="sm:col-span-3 flex items-center gap-2">
+            <input type="number" oninput="updateShareSumBar()" class="w-full bg-brand-surface border border-brand-border rounded-lg p-2.5 text-xs font-mono text-brand-teal font-bold text-center focus:outline-none sh-share" placeholder="%" min="1" max="100" required>
+            <span class="text-xs font-mono text-slate-400">%</span>
+          </div>
         </div>
       `;
       container.appendChild(card);
+      updateShareSumBar();
+    }
+
+    function updateShareSumBar() {
+      const shares = document.querySelectorAll('.sh-share');
+      let sum = 0;
+      shares.forEach(input => {
+        const val = parseInt(input.value) || 0;
+        sum += val;
+      });
+
+      const bar = document.getElementById('sum-bar');
+      const text = document.getElementById('sum-text');
+
+      bar.style.width = `${Math.min(100, sum)}%`;
+      if (sum === 100) {
+        bar.className = 'bg-brand-teal h-full transition-all duration-300';
+        text.className = 'font-bold text-brand-teal';
+        text.textContent = '100% (Valid Allocation)';
+      } else if (sum < 100) {
+        bar.className = 'bg-brand-gold h-full transition-all duration-300';
+        text.className = 'font-bold text-brand-gold';
+        text.textContent = `${sum}% (Under 100%)`;
+      } else {
+        bar.className = 'bg-brand-rose h-full transition-all duration-300';
+        text.className = 'font-bold text-brand-rose';
+        text.textContent = `${sum}% (Exceeds 100%)`;
+      }
     }
 
     async function handleResourceSubmit(e) {
@@ -299,6 +274,10 @@
       const btn = document.getElementById('btn-submit-listing');
       btn.disabled = true;
       btn.textContent = 'Saving Shareholder Configuration to Backend...';
+
+      const title = document.getElementById('node-title').value;
+      const category = document.getElementById('node-category').value;
+      const feeMotes = document.getElementById('node-fee').value;
 
       const addresses = document.querySelectorAll('.sh-address');
       const shares = document.querySelectorAll('.sh-share');
@@ -316,7 +295,7 @@
         const res = await fetch('/api/config/shareholders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ shareholders })
+          body: JSON.stringify({ title, type: category, feeMotes, shareholders })
         });
 
         const contentType = res.headers.get('content-type') || '';
@@ -329,23 +308,25 @@
         }
 
         const msg = document.getElementById('status-msg');
-        msg.style.display = 'block';
+        msg.classList.remove('hidden');
         if (res.ok && data.success) {
-          msg.textContent = `✅ Successfully saved ${shareholders.length} dynamic shareholder wallet accounts to node! Redirecting to Operator Dashboard...`;
-          setTimeout(() => { window.location.href = 'operator.html'; }, 1800);
+          msg.textContent = `✅ Successfully registered hardware node "${title}" with ${shareholders.length} shareholders! Redirecting to Operator Dashboard...`;
+          setTimeout(() => { window.location.href = 'operator.html'; }, 1600);
         } else {
           msg.textContent = `❌ ${data.error || 'Error'}: ${data.message || 'Failed to update shareholders'}`;
           btn.disabled = false;
-          btn.textContent = 'Save & Deploy Configuration to Node';
+          btn.textContent = 'Publish Node & Deploy Shareholder Config';
         }
       } catch (err) {
         const msg = document.getElementById('status-msg');
-        msg.style.display = 'block';
+        msg.classList.remove('hidden');
         msg.textContent = `❌ Submission Error: ${err.message}`;
         btn.disabled = false;
-        btn.textContent = 'Save & Deploy Configuration to Node';
+        btn.textContent = 'Publish Node & Deploy Shareholder Config';
       }
     }
+
+    updateShareSumBar();
   </script>
 
 </body>

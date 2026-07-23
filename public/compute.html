@@ -1,320 +1,239 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compute Marketplace — Machine RWA</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/casper-js-sdk@5.0.12/dist/casper-sdk.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#05070a',
+              surface: '#0a0e17',
+              card: '#0f1523',
+              border: '#1b263b',
+              gold: '#d4a964',
+              goldHover: '#c09650',
+              teal: '#3ba792',
+              rose: '#e65565'
+            }
+          },
+          fontFamily: {
+            sans: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #07090e;
-      --panel: #0d121c;
-      --panel-hover: #131b2a;
-      --border: #1b263b;
-      --text: #ecdcb9;
-      --text-muted: #8496a8;
-      --accent-gold: #d4a964;
-      --accent-teal: #3ba792;
-      --accent-rose: #e65565;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Space Grotesk', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 14px;
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .mono { font-family: 'JetBrains Mono', monospace; }
-
-    .nav-header {
-      border-bottom: 1px solid var(--border);
-      background: rgba(7, 9, 14, 0.95);
-      backdrop-filter: blur(16px);
-      padding: 0 40px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky; top: 0; z-index: 50;
-    }
-
-    .btn {
-      background: var(--panel);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 18px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s ease;
-      text-decoration: none;
-    }
-    .btn:hover { background: var(--panel-hover); border-color: var(--accent-gold); }
-    
-    .btn-gold {
-      background: var(--accent-gold);
-      color: #07090e;
-      border: 1px solid var(--accent-gold);
-      font-weight: 700;
-    }
-    .btn-gold:hover { background: #c2954f; border-color: #c2954f; }
-    .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .input {
-      width: 100%;
-      background: #04060a;
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 13px;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .input:focus { outline: none; border-color: var(--accent-gold); }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px;
-    }
-
-    .modal-backdrop {
-      position: fixed; inset: 0;
-      background: rgba(4, 7, 12, 0.88);
-      backdrop-filter: blur(8px);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 100; opacity: 0; pointer-events: none;
-      transition: opacity 0.2s ease;
-    }
-    .modal-backdrop.active { opacity: 1; pointer-events: auto; }
-
-    .terminal {
-      background: #030407;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      line-height: 1.6;
-      height: 280px;
-      overflow-y: auto;
-      padding: 16px;
-    }
-
-    .step-badge {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: var(--accent-gold);
-      color: #07090e;
-      font-weight: 800;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px;
-    }
-
-    .footer {
-      margin-top: auto;
-      border-top: 1px solid var(--border);
-      background: rgba(7, 9, 14, 0.95);
-      padding: 40px 40px 32px;
-    }
+    body { background-color: #05070a; color: #f1f5f9; }
+    .terminal-scroll::-webkit-scrollbar { width: 6px; }
+    .terminal-scroll::-webkit-scrollbar-track { background: #040609; }
+    .terminal-scroll::-webkit-scrollbar-thumb { background: #1b263b; border-radius: 4px; }
   </style>
 </head>
-<body>
+<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-brand-gold selection:text-black">
 
-  <!-- Top Navigation -->
-  <nav class="nav-header">
-    <div style="display:flex;align-items:center;gap:14px;">
-      <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;">
-        <div style="width:36px;height:36px;background:var(--accent-gold);color:#07090e;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">M</div>
-        <span style="font-weight:800;font-size:16px;letter-spacing:-0.3px;color:var(--text);">Machine RWA</span>
+  <!-- Top Navigation Bar -->
+  <nav class="border-b border-brand-border bg-brand-surface/90 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-brand-gold text-black rounded-lg flex items-center justify-center font-extrabold text-lg shadow-md shadow-brand-gold/20">M</div>
+        <div>
+          <span class="font-extrabold text-base tracking-tight text-white block leading-none">Machine RWA</span>
+          <span class="font-mono text-[10px] text-brand-teal tracking-wide">Compute Marketplace</span>
+        </div>
       </a>
-      <span style="font-size:11px;color:var(--accent-teal);" class="mono">x402 Compute Marketplace</span>
-    </div>
 
-    <div style="display:flex;align-items:center;gap:14px;">
-      <a href="list-resource.html" class="btn">List Hardware Resource</a>
-      <a href="operator.html" class="btn">Operator Dashboard</a>
-      <button id="wallet-connect-btn" onclick="openWalletModal()" class="btn btn-gold">
-        <span id="wallet-btn-label">Connect Casper Wallet</span>
-      </button>
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2">
+          <a href="index.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">Overview</a>
+          <a href="compute.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-brand-gold bg-brand-gold/10 border border-brand-gold/30">Marketplace</a>
+          <a href="list-resource.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">List Hardware</a>
+          <a href="operator.html" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">Operator HUD</a>
+        </div>
+        <button id="wallet-connect-btn" onclick="openWalletModal()" class="px-4 py-2 rounded-xl bg-brand-gold hover:bg-brand-goldHover text-black font-bold text-xs transition shadow-md shadow-brand-gold/20 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a1 1 0 11-2 0 1 1 0 012 0z"/></svg>
+          <span id="wallet-btn-label">Connect Casper Wallet</span>
+        </button>
+      </div>
     </div>
   </nav>
 
-  <!-- Full Width Workspace Layout (Left: 2-Step Workflows | Right: Live Telemetry Output) -->
-  <main style="max-width:1300px;margin:36px auto 64px;padding:0 32px;display:grid;grid-template-columns:1fr 1fr;gap:32px;">
-
-    <!-- Left Column: Step-by-Step Frictionless Compute Job Entry -->
-    <div style="display:flex;flex-direction:column;gap:24px;">
-
-      <div style="margin-bottom:8px;">
-        <h1 style="font-size:28px;font-weight:800;color:#fff;">x402 Compute Marketplace</h1>
-        <p style="font-size:14px;color:var(--text-muted);margin-top:4px;">
-          Execute quantitative real-world asset evaluation tasks powered by accountless x402 micropayments on Casper.
-        </p>
-      </div>
-
-      <!-- Step 1: Payload Selection -->
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-          <div class="step-badge">1</div>
-          <h2 style="font-size:16px;font-weight:700;color:#fff;">Select or Input RWA Payload</h2>
+  <!-- Marketplace Workspace -->
+  <main class="max-w-7xl mx-auto px-6 py-8 w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- Left Column: Available DePIN Nodes & Job Submission -->
+    <div class="lg:col-span-7 space-y-6">
+      
+      <!-- Node Selector Header -->
+      <div class="p-6 rounded-2xl bg-brand-card border border-brand-border space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-teal animate-pulse"></span>
+            Select Target DePIN Compute Node
+          </h2>
+          <span class="font-mono text-xs text-brand-gold bg-brand-gold/10 px-2.5 py-1 rounded-md border border-brand-gold/20">Active Network Nodes</span>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div>
-            <label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:6px;font-weight:600;" class="mono">PRESET DEMO PAYLOADS</label>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-              <button onclick="setPresetPayload('real-estate')" class="btn" style="font-size:11px;justify-content:center;">Commercial Real Estate</button>
-              <button onclick="setPresetPayload('solar')" class="btn" style="font-size:11px;justify-content:center;">Solar Farm Telemetry</button>
-            </div>
-          </div>
-
-          <div>
-            <label style="display:block;font-size:12px;color:var(--text-muted);margin-bottom:6px;font-weight:600;" class="mono">CUSTOM WORKLOAD PROMPT</label>
-            <textarea id="sim-payload" class="input" rows="4" style="resize:none;font-family:'Space Grotesk';">Asset ID: RE-LAG-092. Type: Commercial Real Estate. Location: Victoria Island, Lagos. Current Valuation: $1.2M USD. Verified Annual Rental Yield: 8.4%. Requesting quantitative risk classification.</textarea>
-          </div>
+        <div id="nodes-selector-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Dynamic nodes will render here -->
         </div>
       </div>
 
-      <!-- Step 2: Payment Parameters & 1-Click Execution -->
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-          <div class="step-badge">2</div>
-          <h2 style="font-size:16px;font-weight:700;color:#fff;">Payment & API Execution</h2>
+      <!-- Job Input Form -->
+      <div class="p-6 rounded-2xl bg-brand-card border border-brand-border space-y-5">
+        <div class="flex items-center justify-between border-b border-brand-border pb-4">
+          <h2 class="text-lg font-bold text-white">Quantitative Workload Execution</h2>
+          <span class="font-mono text-xs text-slate-400">HTTP 402 Gated Endpoint</span>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-            <div>
-              <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;" class="mono">x402 FEE (MOTES)</label>
-              <input type="number" id="sim-amount" value="1000000000" class="input" readonly style="color:var(--accent-gold);">
-            </div>
-            <div>
-              <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;" class="mono">OPTIONAL BYOK API KEY</label>
-              <input type="password" id="sim-key" placeholder="sk-..." class="input">
+        <div class="space-y-4">
+          <div>
+            <label class="block font-mono text-xs font-bold text-brand-gold uppercase tracking-wider mb-2">Preset Workload Templates</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="setPresetPayload('real-estate')" class="px-3 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-gold text-xs font-semibold text-slate-300 transition text-left">
+                🏢 Commercial Real Estate Assessment
+              </button>
+              <button onclick="setPresetPayload('solar')" class="px-3 py-2 rounded-lg bg-brand-surface border border-brand-border hover:border-brand-teal text-xs font-semibold text-slate-300 transition text-left">
+                ☀️ Solar Farm Telemetry Audit
+              </button>
             </div>
           </div>
 
-          <div style="padding-top:8px;">
-            <button id="btn-submit" onclick="executeOneClickCompute()" class="btn btn-gold" style="width:100%;justify-content:center;padding:14px;font-size:14px;">
-              Pay 1 CSPR & Execute x402 Compute
-            </button>
+          <div>
+            <label class="block font-mono text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Workload Prompt Payload</label>
+            <textarea id="sim-payload" rows="4" class="w-full bg-brand-bg border border-brand-border rounded-xl p-3.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-brand-gold transition resize-none leading-relaxed">Asset ID: RE-LAG-092. Type: Commercial Real Estate. Location: Victoria Island, Lagos. Current Valuation: $1.2M USD. Verified Annual Rental Yield: 8.4%. Requesting quantitative risk classification.</textarea>
           </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block font-mono text-[11px] text-slate-400 mb-1">x402 FEE (MOTES)</label>
+              <input type="number" id="sim-amount" value="1000000000" readonly class="w-full bg-brand-bg border border-brand-border rounded-lg p-2.5 text-xs font-mono text-brand-gold focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-mono text-[11px] text-slate-400 mb-1">OPTIONAL BYOK API KEY</label>
+              <input type="password" id="sim-key" placeholder="sk-..." class="w-full bg-brand-bg border border-brand-border rounded-lg p-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-brand-gold">
+            </div>
+          </div>
+
+          <button id="btn-submit" onclick="executeOneClickCompute()" class="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-goldHover text-black font-extrabold text-sm transition shadow-lg shadow-brand-gold/20 flex items-center justify-center gap-2">
+            <span>Pay 1 CSPR & Execute x402 Compute</span>
+          </button>
         </div>
       </div>
 
     </div>
 
-    <!-- Right Column: Live Terminal Output & Security Verification -->
-    <div style="display:flex;flex-direction:column;gap:24px;margin-top:52px;">
-      
-      <div class="card" style="height:100%;display:flex;flex-direction:column;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);">
-          <span style="font-size:13px;font-weight:700;color:var(--accent-gold);" class="mono">LIVE VERIFICATION TERMINAL</span>
-          <button onclick="clearLog()" class="btn" style="padding:4px 10px;font-size:11px;">Clear Output</button>
+    <!-- Right Column: Real-Time Execution Console -->
+    <div class="lg:col-span-5 flex flex-col">
+      <div class="p-6 rounded-2xl bg-brand-card border border-brand-border flex-1 flex flex-col space-y-4">
+        <div class="flex items-center justify-between border-b border-brand-border pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-brand-teal"></span>
+            <span class="font-mono text-xs font-bold text-brand-gold uppercase tracking-wider">Live Execution Terminal</span>
+          </div>
+          <button onclick="clearLog()" class="px-2.5 py-1 rounded bg-brand-surface border border-brand-border text-[11px] text-slate-400 hover:text-white transition">Clear</button>
         </div>
 
-        <div class="terminal" id="terminal" style="flex:1;height:auto;min-height:360px;">
-          <span style="color:var(--text-muted);">Terminal initialized. Click "Pay 1 CSPR & Execute x402 Compute" to launch one-click execution.</span>
+        <div id="terminal" class="terminal-scroll flex-1 bg-brand-bg border border-brand-border rounded-xl p-4 font-mono text-xs text-slate-300 leading-relaxed overflow-y-auto min-h-[420px] max-h-[560px] space-y-2">
+          <div class="text-slate-500">// Terminal initialized. Connect Casper Wallet to submit x402 paid compute tasks.</div>
         </div>
 
-        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);" class="mono">
-          <span>Target Node: 016cd14...028f2</span>
+        <div class="pt-3 border-t border-brand-border/60 flex items-center justify-between text-[11px] font-mono text-slate-500">
           <span>Security: Replay Guard Active</span>
+          <span class="text-brand-teal">Casper RPC Verified</span>
         </div>
       </div>
-
     </div>
 
   </main>
 
   <!-- Casper Wallet Modal -->
-  <div id="wallet-modal" class="modal-backdrop">
-    <div class="card" style="width:440px;padding:32px;border-color:var(--accent-gold);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-        <h3 style="font-size:18px;font-weight:800;color:#fff;">Connect Casper Wallet</h3>
-        <button onclick="closeWalletModal()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;">✕</button>
+  <div id="wallet-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="bg-brand-card border border-brand-gold/40 rounded-2xl p-6 max-w-md w-full space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-brand-border pb-3">
+        <h3 class="text-lg font-extrabold text-white">Connect Casper Wallet</h3>
+        <button onclick="closeWalletModal()" class="text-slate-400 hover:text-white text-base">✕</button>
       </div>
 
-      <p style="font-size:13px;color:var(--text-muted);margin-bottom:18px;">
-        Connect your wallet account to automatically sign x402 payment deploys.
-      </p>
+      <p class="text-xs text-slate-400 leading-relaxed">Select your browser wallet provider to automatically sign x402 micropayment deploys on Casper Testnet.</p>
 
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <button onclick="connectCasperExtension()" class="btn" style="justify-content:space-between;padding:14px 16px;border-color:var(--accent-teal);">
-          <span style="font-weight:700;">Casper Wallet Extension</span>
-          <span class="mono" style="font-size:10px;color:var(--accent-teal);">DETECTED / INJECTED</span>
+      <div class="space-y-3">
+        <button onclick="connectCasperExtension()" class="w-full p-4 rounded-xl bg-brand-surface border border-brand-teal/40 hover:border-brand-teal text-left flex items-center justify-between transition">
+          <div>
+            <div class="text-sm font-bold text-white">Casper Wallet Extension</div>
+            <div class="text-[10px] font-mono text-slate-400">Browser Injected Extension</div>
+          </div>
+          <span class="font-mono text-[10px] text-brand-teal bg-brand-teal/10 px-2 py-0.5 rounded border border-brand-teal/30">DETECTED</span>
         </button>
 
-        <button onclick="connectCsprClick()" class="btn" style="justify-content:space-between;padding:14px 16px;border-color:var(--accent-gold);">
-          <span style="font-weight:700;">CSPR.click AI Agent Skill</span>
-          <span class="mono" style="font-size:10px;color:var(--accent-gold);">BUILDATHON SDK</span>
+        <button onclick="connectCsprClick()" class="w-full p-4 rounded-xl bg-brand-surface border border-brand-gold/40 hover:border-brand-gold text-left flex items-center justify-between transition">
+          <div>
+            <div class="text-sm font-bold text-white">CSPR.click AI Agent Skill</div>
+            <div class="text-[10px] font-mono text-slate-400">Buildathon SDK Integration</div>
+          </div>
+          <span class="font-mono text-[10px] text-brand-gold bg-brand-gold/10 px-2 py-0.5 rounded border border-brand-gold/30">SDK AGENT</span>
         </button>
       </div>
     </div>
   </div>
 
   <!-- Complete Site Footer -->
-  <footer class="footer">
-    <div style="max-width:1300px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:32px;">
-      <div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <div style="width:28px;height:28px;background:var(--accent-gold);color:#07090e;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;">M</div>
-          <span style="font-weight:800;font-size:16px;color:#fff;">Machine RWA</span>
+  <footer class="border-t border-brand-border bg-brand-surface py-12">
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-xs text-slate-400">
+      <div class="space-y-3 md:col-span-1">
+        <div class="flex items-center gap-2 text-white font-extrabold text-sm">
+          <div class="w-6 h-6 bg-brand-gold text-black rounded flex items-center justify-center font-bold">M</div>
+          Machine RWA
         </div>
-        <p style="font-size:13px;color:var(--text-muted);max-width:320px;">
-          DePIN hardware tokenization operating system on Casper Network. Built for Casper Agentic Buildathon 2026.
-        </p>
+        <p class="leading-relaxed text-slate-500">DePIN hardware tokenization operating system on Casper Network. Built for Casper Agentic Buildathon 2026.</p>
       </div>
 
       <div>
-        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Product</h4>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-          <a href="compute.html" style="color:var(--text-muted);text-decoration:none;">Compute Marketplace</a>
-          <a href="list-resource.html" style="color:var(--text-muted);text-decoration:none;">List Hardware Resource</a>
-          <a href="operator.html" style="color:var(--text-muted);text-decoration:none;">Operator Dashboard</a>
-        </div>
+        <h4 class="font-mono font-bold text-brand-gold uppercase tracking-wider mb-3">Product</h4>
+        <ul class="space-y-2">
+          <li><a href="compute.html" class="hover:text-white transition">Compute Marketplace</a></li>
+          <li><a href="list-resource.html" class="hover:text-white transition">List Hardware Resource</a></li>
+          <li><a href="operator.html" class="hover:text-white transition">Operator Dashboard</a></li>
+        </ul>
       </div>
 
       <div>
-        <h4 style="font-size:12px;font-weight:700;color:var(--accent-teal);text-transform:uppercase;margin-bottom:12px;" class="mono">Casper Ecosystem</h4>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-          <a href="https://cspr.click" target="_blank" style="color:var(--text-muted);text-decoration:none;">CSPR.click AI Skill</a>
-          <a href="https://testnet.cspr.live" target="_blank" style="color:var(--text-muted);text-decoration:none;">Casper Testnet Explorer</a>
-        </div>
+        <h4 class="font-mono font-bold text-brand-teal uppercase tracking-wider mb-3">Ecosystem</h4>
+        <ul class="space-y-2">
+          <li><a href="https://cspr.click" target="_blank" class="hover:text-white transition">CSPR.click AI Skill</a></li>
+          <li><a href="https://testnet.cspr.live" target="_blank" class="hover:text-white transition">Casper Testnet Explorer</a></li>
+        </ul>
       </div>
 
       <div>
-        <h4 style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;margin-bottom:12px;" class="mono">Developers</h4>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-          <a href="https://github.com/Nifemi0/Machine-RWA" target="_blank" style="color:var(--text-muted);text-decoration:none;">GitHub Repository</a>
-          <a href="/status" target="_blank" style="color:var(--text-muted);text-decoration:none;">JSON Telemetry Endpoint</a>
-        </div>
+        <h4 class="font-mono font-bold text-brand-gold uppercase tracking-wider mb-3">Developers</h4>
+        <ul class="space-y-2">
+          <li><a href="https://github.com/Nifemi0/Machine-RWA" target="_blank" class="hover:text-white transition">GitHub Repository</a></li>
+          <li><a href="/status" target="_blank" class="hover:text-white transition">JSON Telemetry Endpoint</a></li>
+        </ul>
       </div>
     </div>
 
-    <div style="max-width:1300px;margin:0 auto;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);" class="mono">
+    <div class="max-w-7xl mx-auto px-6 pt-6 border-t border-brand-border/50 flex flex-col sm:flex-row justify-between items-center text-[11px] font-mono text-slate-500 gap-2">
       <span>© 2026 Machine RWA • Built on Casper Blockchain</span>
-      <span>Network Status: Testnet Connected</span>
+      <span class="text-brand-teal">Casper Testnet Active</span>
     </div>
   </footer>
 
   <script>
     const term = document.getElementById('terminal');
     let userCasperAddress = localStorage.getItem('connected_casper_wallet') || null;
+    let availableNodes = [];
+    let selectedNodeId = null;
 
     if (userCasperAddress) {
       document.getElementById('wallet-btn-label').textContent = `${userCasperAddress.slice(0, 6)}...${userCasperAddress.slice(-4)}`;
@@ -323,20 +242,20 @@
     function log(msg, type = '') {
       const el = document.createElement('div');
       const ts = new Date().toISOString().split('T')[1].split('.')[0];
-      let color = 'var(--text)';
-      if (type === 'success') color = 'var(--accent-teal)';
-      if (type === 'error') color = 'var(--accent-rose)';
-      if (type === 'halt') color = 'var(--accent-gold)';
+      let color = 'text-slate-300';
+      if (type === 'success') color = 'text-brand-teal font-semibold';
+      if (type === 'error') color = 'text-brand-rose font-semibold';
+      if (type === 'halt') color = 'text-brand-gold font-semibold';
 
       el.innerHTML = type === 'json'
-        ? `<pre style="color:#cbd5e1;padding-left:10px;border-left:2px solid var(--border);margin:4px 0;">${msg}</pre>`
-        : `<span style="color:var(--text-muted);margin-right:8px;">${ts}</span><span style="color:${color};">${msg}</span>`;
+        ? `<pre class="text-slate-300 pl-3 border-l-2 border-brand-border my-1">${msg}</pre>`
+        : `<span class="text-slate-500 mr-2">${ts}</span><span class="${color}">${msg}</span>`;
       term.appendChild(el);
       term.scrollTop = term.scrollHeight;
     }
 
     function clearLog() {
-      term.innerHTML = '<span style="color:var(--text-muted);">Console cleared.</span>';
+      term.innerHTML = '<div class="text-slate-500">// Console cleared.</div>';
     }
 
     function setPresetPayload(type) {
@@ -347,7 +266,56 @@
       }
     }
 
-    // --- Live 1-Click Wallet Signing & Compute Execution ---
+    async function loadDePINNodes() {
+      try {
+        const res = await fetch('/status');
+        const data = await res.json();
+        availableNodes = data.metrics?.listedNodes || [];
+        renderNodeCards();
+      } catch (err) {
+        log(`Could not load node registry: ${err.message}`, 'error');
+      }
+    }
+
+    function renderNodeCards() {
+      const container = document.getElementById('nodes-selector-list');
+      if (!availableNodes || availableNodes.length === 0) {
+        container.innerHTML = `<div class="text-slate-500 text-xs font-mono col-span-2">No active nodes registered.</div>`;
+        return;
+      }
+
+      if (!selectedNodeId && availableNodes.length > 0) {
+        selectedNodeId = availableNodes[0].id;
+      }
+
+      container.innerHTML = availableNodes.map(node => {
+        const isSelected = node.id === selectedNodeId;
+        return `
+          <div onclick="selectNode('${node.id}')" class="p-3.5 rounded-xl border cursor-pointer transition ${isSelected ? 'bg-brand-surface border-brand-gold shadow-md' : 'bg-brand-bg border-brand-border hover:border-slate-700'}">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-mono text-[10px] text-brand-gold font-bold">${node.id.toUpperCase()}</span>
+              <span class="font-mono text-[10px] text-brand-teal">${node.status}</span>
+            </div>
+            <div class="text-xs font-bold text-white truncate">${node.title}</div>
+            <div class="text-[11px] font-mono text-slate-400 mt-1 flex justify-between">
+              <span>Fee: ${Number(node.feeMotes)/1e9} CSPR</span>
+              <span class="text-brand-teal">${node.type.split(' ')[0]}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectNode(id) {
+      selectedNodeId = id;
+      const node = availableNodes.find(n => n.id === id);
+      if (node) {
+        document.getElementById('sim-amount').value = node.feeMotes || '1000000000';
+        log(`Target DePIN node selected: "${node.title}" (${Number(node.feeMotes)/1e9} CSPR fee)`, 'halt');
+      }
+      renderNodeCards();
+    }
+
     async function executeOneClickCompute() {
       if (!userCasperAddress) {
         log('No Casper wallet connected. Opening wallet modal...', 'halt');
@@ -357,38 +325,34 @@
 
       const btn = document.getElementById('btn-submit');
       btn.disabled = true;
-      btn.textContent = 'Requesting Casper Wallet Signature (1 CSPR)...';
+      btn.textContent = 'Requesting Casper Wallet Signature...';
 
-      log(`Initiating 1 CSPR x402 Micropayment from wallet ${userCasperAddress.slice(0, 10)}...`, 'halt');
+      log(`Initiating x402 Micropayment from wallet ${userCasperAddress.slice(0, 10)}...`, 'halt');
 
       let proofHash;
       try {
         if (window.CasperWalletProvider && window.CasperSDK) {
           const provider = window.CasperWalletProvider();
-          
-          // Target recipient: Agent Machine Public Key (016cd149ef6daa305e450d0476850287c59e138d981fc3470661e764613b1028f2)
           const targetPubHex = "016cd149ef6daa305e450d0476850287c59e138d981fc3470661e764613b1028f2";
           const senderKey = window.CasperSDK.PublicKey.fromHex(userCasperAddress);
           const recipientKey = window.CasperSDK.PublicKey.fromHex(targetPubHex);
           
-          // Construct real 1 CSPR Transfer Deploy on Casper Testnet
           const deploy = window.CasperSDK.makeCsprTransferDeploy({
             senderPublicKey: senderKey,
             recipientPublicKey: recipientKey,
-            amountMotes: "1000000000",
+            amountMotes: document.getElementById('sim-amount').value || "1000000000",
             transferId: Date.now(),
             networkName: "casper-test"
           });
 
           const deployJson = window.CasperSDK.DeployUtil.deployToJson(deploy);
-          log(`Submitting Deploy to Casper Wallet Extension for On-Chain Sign...`, 'halt');
+          log(`Submitting Transfer Deploy to Casper Wallet Extension...`, 'halt');
           
           const signedResult = await provider.sign(JSON.stringify(deployJson), userCasperAddress);
           if (signedResult.cancelled) {
             throw new Error("User cancelled transfer transaction in Casper Wallet.");
           }
           
-          // Extract exact on-chain Deploy Hash hex
           const signedDeploy = window.CasperSDK.DeployUtil.deployFromJson(signedResult.deploy || signedResult);
           proofHash = window.CasperSDK.encodeBase16(signedDeploy.deploy.hash).toLowerCase();
         } else if (window.CasperWalletProvider) {
@@ -463,7 +427,7 @@
             userCasperAddress = await provider.getActivePublicKey();
             localStorage.setItem('connected_casper_wallet', userCasperAddress);
             document.getElementById('wallet-btn-label').textContent = `${userCasperAddress.slice(0, 6)}...${userCasperAddress.slice(-4)}`;
-            log(`Casper Wallet Extension Connected: ${userCasperAddress}`, 'success');
+            log(`Casper Wallet Connected: ${userCasperAddress}`, 'success');
             closeWalletModal();
             return;
           }
@@ -487,8 +451,16 @@
       closeWalletModal();
     }
 
-    function openWalletModal() { document.getElementById('wallet-modal').classList.add('active'); }
-    function closeWalletModal() { document.getElementById('wallet-modal').classList.remove('active'); }
+    function openWalletModal() {
+      const modal = document.getElementById('wallet-modal');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+    function closeWalletModal() {
+      const modal = document.getElementById('wallet-modal');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    loadDePINNodes();
   </script>
 </body>
 </html>

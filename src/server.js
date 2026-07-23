@@ -1,23 +1,13 @@
-/**
- * MachinaRWA Local Machine API Server
- * Implements x402 payment-gating for machine compute tasks.
- */
-
 const express = require('express');
-const crypto = require('crypto');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 const { getOrCreateAgentKeys, verifyCasperDeployOnChain } = require('./casper-client');
 
 const app = express();
 
-// Serve the static frontend dashboard
 app.use(express.static(path.join(__dirname, '../public')));
-
-// BUG FIX 1: Body size limit — reject oversized payloads (was already 100kb default but explicit is safer)
 app.use(express.json({ limit: '64kb' }));
 
-// BUG FIX 2: Handle JSON parse + body size errors gracefully
 app.use((err, req, res, next) => {
   if (err.type === 'entity.parse.failed') {
     return res.status(400).json({ error: 'Invalid JSON', message: 'Request body could not be parsed.' });
@@ -28,16 +18,14 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-const PORT = process.env.MACHINE_PORT || 8090;
+const PORT = process.env.MACHINE_PORT || process.env.PORT || 8090;
 
-// Setup agent identity
 const agentKeys = getOrCreateAgentKeys();
-// BUG FIX 3: agentKeys.publicKey doesn't exist — it's agentKeys.pub in casper-js-sdk v5.x
 const agentPublicKeyHex = agentKeys.pub.toHex();
 
-// In-memory + persistent seen proofs set
-const METRICS_FILE = path.join(process.env.HOME || '/root', '.shipguard', 'machina-server-metrics.json');
-const PROOFS_FILE = path.join(process.env.HOME || '/root', '.shipguard', 'machina-redeemed-proofs.json');
+const DATA_DIR = process.env.VERCEL ? '/tmp' : path.join(process.env.HOME || '/root', '.shipguard');
+const METRICS_FILE = path.join(DATA_DIR, 'machina-server-metrics.json');
+const PROOFS_FILE = path.join(DATA_DIR, 'machina-redeemed-proofs.json');
 
 const seenProofs = new Set();
 try {
@@ -57,7 +45,7 @@ function saveRedeemedProofs() {
   }
 }
 
-// Metrics store
+// In-memory node metrics & registry
 let metrics = {
   uptimeSeconds: 0,
   completedJobs: 0,
@@ -66,10 +54,34 @@ let metrics = {
   shareholders: [
     { address: '01c238bdf5a5dbfb2b7692cd01828f26687a49c2182fb5b8403b262709e0d324b9', share: 60 },
     { address: '015fe42d789a12887d77ebaed26687a49c2182fb5b8403b262709e0d324b999990', share: 40 }
+  ],
+  listedNodes: [
+    {
+      id: 'node-01',
+      title: 'Machine-Node-Alpha (CPU Quantitative Inference)',
+      type: 'CPU Quantitative Inference Node',
+      feeMotes: '1000000000',
+      status: 'ACTIVE',
+      specs: '16 vCPU • 64GB RAM • Ed25519 Verified',
+      shareholders: [
+        { address: '01c238bdf5a5dbfb2b7692cd01828f26687a49c2182fb5b8403b262709e0d324b9', share: 60 },
+        { address: '015fe42d789a12887d77ebaed26687a49c2182fb5b8403b262709e0d324b999990', share: 40 }
+      ]
+    },
+    {
+      id: 'node-02',
+      title: 'Solar Telemetry Oracle #04 (Sahara West)',
+      type: 'IoT Solar & Sensor Telemetry Oracle',
+      feeMotes: '1500000000',
+      status: 'ACTIVE',
+      specs: '4.2 MW/h Sensor Array • Low Latency IoT Gateway',
+      shareholders: [
+        { address: '01c238bdf5a5dbfb2b7692cd01828f26687a49c2182fb5b8403b262709e0d324b9', share: 100 }
+      ]
+    }
   ]
 };
 
-// Load existing metrics so revenue is never lost on restart
 try {
   if (fs.existsSync(METRICS_FILE)) {
     const data = JSON.parse(fs.readFileSync(METRICS_FILE, 'utf8'));
@@ -77,6 +89,7 @@ try {
     metrics.accumulatedRevenueMotes = BigInt(data.accumulatedRevenueMotes || 0);
     metrics.uptimeSeconds = data.uptimeSeconds || 0;
     if (data.shareholders) metrics.shareholders = data.shareholders;
+    if (data.listedNodes) metrics.listedNodes = data.listedNodes;
   }
 } catch (e) {
   console.error('[MachineServer] Could not load persisted metrics, starting fresh.', e.message);
@@ -91,7 +104,8 @@ function saveMetrics() {
       completedJobs: metrics.completedJobs,
       accumulatedRevenueMotes: metrics.accumulatedRevenueMotes.toString(),
       currentCpuTemp: metrics.currentCpuTemp,
-      shareholders: metrics.shareholders
+      shareholders: metrics.shareholders,
+      listedNodes: metrics.listedNodes
     }), 'utf8');
   } catch (e) {
     console.error('[MachineServer] Failed to save metrics:', e.message);
@@ -103,14 +117,13 @@ const os = require('os');
 setInterval(() => { metrics.uptimeSeconds++; }, 1000);
 setInterval(() => {
   const loadAvg = os.loadavg()[0];
-  metrics.cpuLoadPercent = parseFloat(((loadAvg / os.cpus().length) * 100).toFixed(1));
+  metrics.cpuLoadPercent = parseFloat(((loadAvg / Math.max(1, os.cpus().length)) * 100).toFixed(1));
   metrics.currentCpuTemp = parseFloat((38 + (metrics.cpuLoadPercent * 0.2)).toFixed(1));
 }, 3000);
-// Periodically save revenue to disk
 setInterval(saveMetrics, 5000);
 
 /**
- * 1. Health Status check
+ * 1. Health & Status Check Endpoint
  */
 app.get('/status', (req, res) => {
   res.json({
@@ -123,21 +136,28 @@ app.get('/status', (req, res) => {
       cpu_temperature: metrics.currentCpuTemp,
       cpu_load_percent: metrics.cpuLoadPercent || 15.0,
       redeemed_proofs_count: seenProofs.size,
-      shareholders: metrics.shareholders
+      shareholders: metrics.shareholders,
+      listedNodes: metrics.listedNodes
     }
   });
 });
 
 /**
- * Update Shareholder Config
+ * 2. Get Registered DePIN Hardware Nodes
+ */
+app.get('/api/nodes', (req, res) => {
+  res.json({ success: true, nodes: metrics.listedNodes });
+});
+
+/**
+ * 3. Register / Update Hardware Resource Node
  */
 app.post('/api/config/shareholders', (req, res) => {
-  const { shareholders } = req.body || {};
+  const { title, type, feeMotes, shareholders } = req.body || {};
   if (!Array.isArray(shareholders) || shareholders.length === 0) {
     return res.status(400).json({ error: 'Invalid Shareholders Array', message: 'Must provide an array of shareholder objects.' });
   }
 
-  // Validate address format and calculate percentage total sum
   let totalShare = 0;
   for (const s of shareholders) {
     if (!s.address || typeof s.address !== 'string' || !/^[a-fA-F0-9]{66}$/.test(s.address.trim())) {
@@ -161,19 +181,32 @@ app.post('/api/config/shareholders', (req, res) => {
   }
 
   metrics.shareholders = shareholders;
+
+  if (title) {
+    const newNode = {
+      id: `node-${Date.now().toString(36)}`,
+      title: title.trim(),
+      type: type || 'CPU Quantitative Inference Node',
+      feeMotes: feeMotes || '1000000000',
+      status: 'ACTIVE',
+      specs: 'Dynamic Node Instance • Verified Shareholder Pool',
+      shareholders: shareholders
+    };
+    metrics.listedNodes.unshift(newNode);
+  }
+
   saveMetrics();
-  return res.json({ success: true, shareholders: metrics.shareholders });
+  return res.json({ success: true, shareholders: metrics.shareholders, listedNodes: metrics.listedNodes });
 });
 
 /**
- * 2. Paid Compute Task (Gated by x402 with optional BYOK x-api-key)
+ * 4. Paid Compute Task (x402 Micropayment Gated)
  */
 app.post('/api/compute', async (req, res) => {
   const paymentProof = req.headers['x-payment-proof'];
   const paymentAmountRaw = req.headers['x-payment-amount'];
   const userApiKey = req.headers['x-api-key'];
 
-  // Missing payment headers
   if (!paymentProof || !paymentAmountRaw) {
     res.setHeader('WWW-Authenticate', 'x402');
     return res.status(402).json({
@@ -218,7 +251,7 @@ app.post('/api/compute', async (req, res) => {
       message: 'This payment proof deploy hash has already been redeemed.'
     });
   }
-  
+
   // Verify deploy status on Casper Testnet RPC node
   const rpcCheck = await verifyCasperDeployOnChain(paymentProof, amountMotes, agentPublicKeyHex);
   if (!rpcCheck.verified) {
@@ -250,10 +283,9 @@ app.post('/api/compute', async (req, res) => {
 
   let reasoning;
 
-  // BYOK (Bring Your Own Key) Support
+  // BYOK Support
   if (userApiKey) {
     try {
-      console.log('[MachineServer] Client provided custom x-api-key. Calling OpenAI Gateway...');
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -278,14 +310,14 @@ app.post('/api/compute', async (req, res) => {
     }
   }
 
-  // Deterministic Rule Engine Fallback if no key or BYOK failed
+  // Deterministic Rule Engine Fallback
   if (!reasoning) {
     const hasValuation = /\$?\d+(\.\d+)?[MkB]?/i.test(sanitizedInput);
     const hasYield = /\d+(\.\d+)?%/i.test(sanitizedInput);
     
-    let confidence = 90;
+    let confidence = 92;
     let risk = "LOW";
-    let summary = "Quantitative rule engine verified valid asset valuation & yield metrics.";
+    let summary = "Quantitative machine engine verified valid asset valuation & yield metrics.";
     
     if (!hasValuation || !hasYield) {
       confidence = 45;
@@ -301,35 +333,35 @@ app.post('/api/compute', async (req, res) => {
     };
   }
 
-    // GUARDRAIL: Halt on low confidence or human audit requirement
-    if (reasoning.confidence_score < 85 || reasoning.requires_human_audit) {
-      console.log(`[MachineServer] GUARDRAIL TRIGGERED: Confidence ${reasoning.confidence_score} too low.`);
-      return res.status(200).json({
-        success: false,
-        status: 'HALTED',
-        reason: 'Agent confidence below safety threshold or human audit required.',
-        payment_verified: { proof: paymentProof, amount_motes: paymentAmountRaw },
-        agent_reasoning: reasoning
-      });
-    }
-
-    return res.json({
-      success: true,
-      status: 'COMPLETED',
+  if (reasoning.confidence_score < 85 || reasoning.requires_human_audit) {
+    return res.status(200).json({
+      success: false,
+      status: 'HALTED',
+      reason: 'Agent confidence below safety threshold or human audit required.',
       payment_verified: { proof: paymentProof, amount_motes: paymentAmountRaw },
       agent_reasoning: reasoning
     });
+  }
+
+  return res.json({
+    success: true,
+    status: 'COMPLETED',
+    payment_verified: { proof: paymentProof, amount_motes: paymentAmountRaw },
+    agent_reasoning: reasoning
+  });
 });
 
-// BUG FIX 11: Catch-all error handler for unhandled throws inside routes
 app.use((err, req, res, next) => {
   console.error('[MachineServer] Unhandled error:', err.message);
   res.status(500).json({ error: 'Internal Server Error', message: err.message });
 });
 
-app.listen(PORT, () => {
-  console.log(`[MachineServer] MachinaRWA API running on port ${PORT}`);
-  console.log(`[MachineServer] Agent Public Key: ${agentPublicKeyHex}`);
-});
-
-module.exports = { app, metrics };
+if (process.env.VERCEL) {
+  module.exports = app;
+} else {
+  app.listen(PORT, () => {
+    console.log(`[MachineServer] MachinaRWA API running on port ${PORT}`);
+    console.log(`[MachineServer] Agent Public Key: ${agentPublicKeyHex}`);
+  });
+  module.exports = { app, metrics };
+}
