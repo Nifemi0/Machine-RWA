@@ -141,19 +141,19 @@ async function distributeRevenueToHolders(amountCspr, holders = [], agentKeys) {
 }
 
 /**
- * Verifies an on-chain Casper Deploy transaction via Testnet RPC
+ * Verifies an on-chain Casper Deploy transaction via Testnet RPC (STRICT MODE)
  */
 async function verifyCasperDeployOnChain(deployHashHex, requiredMotes = 1000000000n, expectedRecipientHex) {
   try {
     const fetchDeploy = typeof rpc.getDeployInfo === 'function' ? rpc.getDeployInfo.bind(rpc) : (typeof rpc.getDeploy === 'function' ? rpc.getDeploy.bind(rpc) : null);
     
     if (!fetchDeploy) {
-      return { verified: true, pending: true, reason: 'RPC getDeploy method format verified.' };
+      return { verified: false, reason: 'Casper RPC client interface unavailable.' };
     }
 
     const deployInfo = await fetchDeploy(deployHashHex);
     if (!deployInfo || !deployInfo.execution_results || deployInfo.execution_results.length === 0) {
-      return { verified: true, pending: true, reason: 'Deploy is pending on Casper Testnet RPC.' };
+      return { verified: false, reason: 'Deploy not found or not yet executed/indexed on Casper Testnet RPC.' };
     }
 
     const execResult = deployInfo.execution_results[0].result;
@@ -163,7 +163,7 @@ async function verifyCasperDeployOnChain(deployHashHex, requiredMotes = 10000000
 
     return { verified: true, pending: false };
   } catch (e) {
-    return { verified: true, pending: true, reason: `RPC node check: ${e.message}` };
+    return { verified: false, reason: `Casper Testnet RPC verification failed: ${e.message}` };
   }
 }
 
